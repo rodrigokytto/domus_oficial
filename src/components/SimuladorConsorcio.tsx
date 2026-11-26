@@ -1,12 +1,12 @@
-import React, { useMemo, useState } from "react";
+import type React from "react";
+import { useMemo, useState } from "react";
 import {
   calcularSimulacaoConsorcio,
   formatarMoeda,
   formatarPercentual,
-  TABELAS_ADMINISTRADORAS,
-  TAXAS_PADRAO_CATEGORIA,
 } from "../lib/motor-consorcios";
-import type { AdministradoraConsorcio, CategoriaConsorcio } from "../types/consorcio";
+import type { CategoriaConsorcio } from "../types/consorcio";
+import { MARCA_GAMA } from "../lib/marcaGama";
 
 interface SimuladorProps {
   telefoneWhatsappPadrao?: string;
@@ -59,187 +59,190 @@ const CATEGORIAS_CONFIG: {
     id: "pesados_agro",
     titulo: "Pesados & Agro",
     icone: "🚜",
-    descricao: "Tratores, colheitadeiras, caminhões e implementos agrícolas",
-    valorPadrao: 600_000,
+    descricao: "Tratores, colheitadeiras, caminhões, implementos e pivôs",
+    valorPadrao: 800_000,
     valorMin: 200_000,
-    valorMax: 2_000_000,
+    valorMax: 3_000_000,
     passo: 50_000,
-    prazoPadrao: 100,
-    prazosDisponiveis: [60, 84, 100, 120],
+    prazoPadrao: 120,
+    prazosDisponiveis: [60, 84, 100, 120, 150],
   },
   {
     id: "servicos",
-    titulo: "Serviços & Solar",
-    icone: "☀️",
-    descricao: "Energia solar fotovoltaica, reformas, cirurgias e viagens",
-    valorPadrao: 35_000,
-    valorMin: 15_000,
-    valorMax: 100_000,
-    passo: 2_500,
-    prazoPadrao: 36,
-    prazosDisponiveis: [24, 36, 48],
+    titulo: "Alavancagem & Serviços",
+    icone: "📈",
+    descricao: "Construção de patrimônio, capital de giro e reformas",
+    valorPadrao: 60_000,
+    valorMin: 20_000,
+    valorMax: 200_000,
+    passo: 5_000,
+    prazoPadrao: 40,
+    prazosDisponiveis: [24, 36, 40, 48],
   },
 ];
 
 export const SimuladorConsorcio: React.FC<SimuladorProps> = ({
-  telefoneWhatsappPadrao = "5565999025800",
+  telefoneWhatsappPadrao = MARCA_GAMA.telefoneWhatsapp,
   aoSubmeterLead,
 }) => {
-  const [categoria, setCategoria] = useState<CategoriaConsorcio>("imobiliario");
-  const configCat = CATEGORIAS_CONFIG.find((c) => c.id === categoria) || CATEGORIAS_CONFIG[0];
+  const [categoriaAtiva, setCategoriaAtiva] = useState<CategoriaConsorcio>("imobiliario");
+  const configAtual = useMemo(
+    () => CATEGORIAS_CONFIG.find((c) => c.id === categoriaAtiva) ?? CATEGORIAS_CONFIG[0],
+    [categoriaAtiva],
+  );
 
-  const [valorCredito, setValorCredito] = useState<number>(configCat.valorPadrao);
-  const [prazoMeses, setPrazoMeses] = useState<number>(configCat.prazoPadrao);
-  const [modalidade, setModalidade] = useState<"integral" | "reduzida_70" | "reduzida_50">("integral");
-  const [administradora, setAdministradora] = useState<AdministradoraConsorcio | "todas">("todas");
+  const [valorCredito, setValorCredito] = useState<number>(configAtual.valorPadrao);
+  const [prazoMeses, setPrazoMeses] = useState<number>(configAtual.prazoPadrao);
+  const [modalidade, setModalidade] = useState<"integral" | "reduzida_70">("reduzida_70");
 
-  // Dados do formulário de contato rápido
-  const [nome, setNome] = useState("");
-  const [telefone, setTelefone] = useState("");
-  const [enviado, setEnviado] = useState(false);
+  // Form Lead
+  const [nomeLead, setNomeLead] = useState("");
+  const [telefoneLead, setTelefoneLead] = useState("");
+  const [leadEnviado, setLeadEnviado] = useState(false);
 
-  // Ao mudar de categoria, ajusta limites e prazos padrão
-  const handleTrocaCategoria = (novaCat: CategoriaConsorcio) => {
-    setCategoria(novaCat);
-    const novaConfig = CATEGORIAS_CONFIG.find((c) => c.id === novaCat) || CATEGORIAS_CONFIG[0];
-    setValorCredito(novaConfig.valorPadrao);
-    setPrazoMeses(novaConfig.prazoPadrao);
-    setAdministradora("todas");
+  const trocarCategoria = (nova: CategoriaConsorcio) => {
+    setCategoriaAtiva(nova);
+    const novaCfg = CATEGORIAS_CONFIG.find((c) => c.id === nova) ?? CATEGORIAS_CONFIG[0];
+    setValorCredito(novaCfg.valorPadrao);
+    setPrazoMeses(novaCfg.prazoPadrao);
+    setLeadEnviado(false);
   };
 
   const resultado = useMemo(() => {
     return calcularSimulacaoConsorcio({
-      categoria,
+      categoria: categoriaAtiva,
       valorCredito,
       prazoMeses,
       modalidadeParcela: modalidade,
-      administradoraSugerida: administradora === "todas" ? undefined : administradora,
     });
-  }, [categoria, valorCredito, prazoMeses, modalidade, administradora]);
+  }, [categoriaAtiva, valorCredito, prazoMeses, modalidade]);
 
-  const linkWhatsapp = useMemo(() => {
-    const texto = encodeURIComponent(
-      `Olá! Estive no site da Domus e simulei um Consórcio ${configCat.titulo}.\n\n` +
-        `• Crédito: ${formatarMoeda(valorCredito)}\n` +
-        `• Prazo: ${prazoMeses} meses\n` +
-        `• Parcela estimada: ${formatarMoeda(
-          modalidade === "reduzida_70" && resultado.parcelaReduzidaMensal
-            ? resultado.parcelaReduzidaMensal
-            : resultado.parcelaIntegralMensal,
-        )}/mês\n` +
-        `• Economia estimada vs Financiamento: ${formatarMoeda(
-          resultado.comparativoFinanciamento.economiaConsorcioValor,
-        )}\n\n` +
-        `Gostaria de receber uma proposta detalhada dos grupos disponíveis com maior chance de contemplação.`,
-    );
-    return `https://wa.me/${telefoneWhatsappPadrao}?text=${texto}`;
-  }, [configCat, valorCredito, prazoMeses, modalidade, resultado, telefoneWhatsappPadrao]);
+  const parcelaExibida = resultado.parcelaReduzidaMensal ?? resultado.parcelaIntegralMensal;
 
-  const handleSubmitLead = (e: React.FormEvent) => {
+  const enviarWhatsApp = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!nome.trim() || !telefone.trim()) return;
-    if (aoSubmeterLead) {
+    if (aoSubmeterLead && nomeLead && telefoneLead) {
       aoSubmeterLead({
-        nome,
-        telefone,
-        categoria,
+        nome: nomeLead,
+        telefone: telefoneLead,
+        categoria: categoriaAtiva,
         valorCredito,
         prazoMeses,
       });
     }
-    setEnviado(true);
+
+    const mensagem = encodeURIComponent(
+      `Olá! Fiz uma simulação na Domus Consórcios & Gama Patrimonial:\n\n` +
+        `• Categoria: ${configAtual.titulo}\n` +
+        `• Crédito: ${formatarMoeda(valorCredito)}\n` +
+        `• Prazo: ${prazoMeses} meses\n` +
+        `• Parcela Inicial: ${formatarMoeda(parcelaExibida)}\n` +
+        `• Modalidade: ${modalidade === "reduzida_70" ? "Parcela Reduzida 70%" : "Integral"}\n\n` +
+        `Meu nome é ${nomeLead || "Cliente"} (${telefoneLead || "Contato"}). Gostaria de receber uma proposta detalhada.`,
+    );
+
+    window.open(`https://wa.me/${telefoneWhatsappPadrao}?text=${mensagem}`, "_blank");
+    setLeadEnviado(true);
   };
 
   return (
-    <div style={{ background: "#ffffff", borderRadius: "16px", padding: "32px", border: "1px solid #e2e8f0" }}>
-      <div style={{ textAlign: "center", marginBottom: "32px" }}>
-        <h2 style={{ fontSize: "28px", fontWeight: "700", color: "#0e6b57", margin: "0 0 8px 0" }}>
-          Simulador Inteligente Domus Consórcios
+    <div
+      style={{
+        background: "#ffffff",
+        borderRadius: "16px",
+        boxShadow: "0 10px 30px -5px rgba(0, 0, 0, 0.05)",
+        border: "1px solid #E5DFC9",
+        padding: "32px",
+        maxWidth: "1000px",
+        margin: "0 auto",
+      }}
+    >
+      <div style={{ textAlign: "center", marginBottom: "28px" }}>
+        <h2 style={{ fontSize: "28px", fontWeight: "700", color: "#121212", margin: "0 0 8px 0" }}>
+          Simulador de Consórcio Domus & Gama Patrimonial
         </h2>
-        <p style={{ color: "#4a5568", fontSize: "16px", margin: 0 }}>
-          Descubra o plano ideal para conquistar seu patrimônio sem pagar os juros abusivos do financiamento.
+        <p style={{ color: "#64748b", fontSize: "15px", margin: 0 }}>
+          Descubra o valor exato da sua parcela sem juros e compare com o financiamento bancário
         </p>
       </div>
 
-      {/* Seletor de Categorias */}
+      {/* Seletor de Categoria */}
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
           gap: "12px",
-          marginBottom: "28px",
+          marginBottom: "32px",
         }}
       >
         {CATEGORIAS_CONFIG.map((cat) => {
-          const ativo = cat.id === categoria;
+          const ativo = cat.id === categoriaAtiva;
           return (
             <button
               key={cat.id}
               type="button"
-              onClick={() => handleTrocaCategoria(cat.id)}
+              onClick={() => trocarCategoria(cat.id)}
               style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                padding: "16px 12px",
+                border: ativo ? "2px solid #C6A15B" : "1px solid #cbd5e1",
+                background: ativo ? "#F7F3EA" : "#ffffff",
                 borderRadius: "12px",
-                border: ativo ? "2px solid #0e6b57" : "1px solid #cbd5e1",
-                background: ativo ? "#e6f4f1" : "#f8fafc",
+                padding: "16px 12px",
                 cursor: "pointer",
-                transition: "all 0.2s ease",
+                textAlign: "center",
+                transition: "all 0.2s",
               }}
             >
-              <span style={{ fontSize: "28px", marginBottom: "6px" }}>{cat.icone}</span>
-              <span style={{ fontWeight: "700", color: ativo ? "#0e6b57" : "#1e293b", fontSize: "15px" }}>
+              <div style={{ fontSize: "24px", marginBottom: "6px" }}>{cat.icone}</div>
+              <span style={{ fontWeight: "700", color: ativo ? "#121212" : "#1e293b", fontSize: "15px" }}>
                 {cat.titulo}
               </span>
-              <span style={{ fontSize: "11px", color: "#64748b", textAlign: "center", marginTop: "4px" }}>
-                {cat.descricao}
-              </span>
+              <p style={{ fontSize: "11px", color: "#64748b", margin: "4px 0 0 0" }}>{cat.descricao}</p>
             </button>
           );
         })}
       </div>
 
-      {/* Grid de Configuração do Crédito e Prazo */}
+      {/* Controles de Valor e Prazo */}
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          gap: "24px",
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+          gap: "28px",
           marginBottom: "32px",
         }}
       >
         {/* Controle do Valor do Crédito */}
         <div style={{ background: "#f8fafc", padding: "20px", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
-          <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "#334155", marginBottom: "8px" }}>
-            Valor do Crédito Desejado
-          </label>
-          <div style={{ fontSize: "32px", fontWeight: "800", color: "#0e6b57", marginBottom: "12px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+            <span style={{ fontSize: "14px", fontWeight: "600", color: "#475569" }}>Valor da Carta de Crédito</span>
+            <span style={{ fontSize: "12px", color: "#64748b" }}>
+              Mín: {formatarMoeda(configAtual.valorMin)}
+            </span>
+          </div>
+          <div style={{ fontSize: "32px", fontWeight: "800", color: "#121212", marginBottom: "12px" }}>
             {formatarMoeda(valorCredito)}
           </div>
           <input
             type="range"
-            min={configCat.valorMin}
-            max={configCat.valorMax}
-            step={configCat.passo}
+            min={configAtual.valorMin}
+            max={configAtual.valorMax}
+            step={configAtual.passo}
             value={valorCredito}
             onChange={(e) => setValorCredito(Number(e.target.value))}
-            style={{ width: "100%", accentColor: "#0e6b57", cursor: "pointer" }}
+            style={{ width: "100%", accentColor: "#C6A15B", cursor: "pointer" }}
           />
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#64748b", marginTop: "6px" }}>
-            <span>{formatarMoeda(configCat.valorMin)}</span>
-            <span>{formatarMoeda(configCat.valorMax)}</span>
-          </div>
         </div>
 
         {/* Controle do Prazo */}
         <div style={{ background: "#f8fafc", padding: "20px", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
-          <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "#334155", marginBottom: "8px" }}>
-            Prazo do Plano
-          </label>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+            <span style={{ fontSize: "14px", fontWeight: "600", color: "#475569" }}>Prazo do Plano</span>
+            <span style={{ fontSize: "14px", fontWeight: "700", color: "#121212" }}>
+              {prazoMeses} meses ({Math.round(prazoMeses / 12)} anos)
+            </span>
+          </div>
           <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginTop: "12px" }}>
-            {configCat.prazosDisponiveis.map((p) => {
+            {configAtual.prazosDisponiveis.map((p) => {
               const selecionado = p === prazoMeses;
               return (
                 <button
@@ -247,212 +250,160 @@ export const SimuladorConsorcio: React.FC<SimuladorProps> = ({
                   type="button"
                   onClick={() => setPrazoMeses(p)}
                   style={{
-                    padding: "8px 16px",
+                    border: selecionado ? "2px solid #C6A15B" : "1px solid #cbd5e1",
+                    background: selecionado ? "#121212" : "#ffffff",
+                    color: selecionado ? "#ffffff" : "#1e293b",
                     borderRadius: "8px",
-                    border: selecionado ? "2px solid #0e6b57" : "1px solid #cbd5e1",
-                    background: selecionado ? "#0e6b57" : "#ffffff",
-                    color: selecionado ? "#ffffff" : "#334155",
+                    padding: "8px 14px",
                     fontWeight: "600",
-                    fontSize: "14px",
+                    fontSize: "13px",
                     cursor: "pointer",
                   }}
                 >
-                  {p} meses ({Math.floor(p / 12)}a{p % 12 ? ` ${p % 12}m` : ""})
+                  {p}m
                 </button>
               );
             })}
           </div>
 
+          {/* Modalidade de Parcela */}
           <div style={{ marginTop: "16px" }}>
-            <label style={{ fontSize: "13px", fontWeight: "600", color: "#475569" }}>Modalidade de Parcela:</label>
-            <div style={{ display: "flex", gap: "10px", marginTop: "6px" }}>
+            <span style={{ fontSize: "13px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "6px" }}>
+              Opção de Parcela
+            </span>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
               <button
                 type="button"
                 onClick={() => setModalidade("integral")}
                 style={{
-                  padding: "6px 12px",
+                  padding: "8px",
                   borderRadius: "6px",
-                  fontSize: "12px",
+                  border: modalidade === "integral" ? "1px solid #C6A15B" : "1px solid #cbd5e1",
+                  background: modalidade === "integral" ? "#F7F3EA" : "#ffffff",
+                  color: modalidade === "integral" ? "#121212" : "#64748b",
                   fontWeight: "600",
+                  fontSize: "12px",
                   cursor: "pointer",
-                  border: modalidade === "integral" ? "1px solid #0e6b57" : "1px solid #cbd5e1",
-                  background: modalidade === "integral" ? "#e6f4f1" : "#ffffff",
-                  color: modalidade === "integral" ? "#0e6b57" : "#64748b",
                 }}
               >
-                100% Integral
+                Parcela Integral
               </button>
               <button
                 type="button"
                 onClick={() => setModalidade("reduzida_70")}
                 style={{
-                  padding: "6px 12px",
+                  padding: "8px",
                   borderRadius: "6px",
+                  border: modalidade === "reduzida_70" ? "1px solid #C6A15B" : "1px solid #cbd5e1",
+                  background: modalidade === "reduzida_70" ? "#F7F3EA" : "#ffffff",
+                  color: modalidade === "reduzida_70" ? "#121212" : "#64748b",
+                  fontWeight: "700",
                   fontSize: "12px",
-                  fontWeight: "600",
                   cursor: "pointer",
-                  border: modalidade === "reduzida_70" ? "1px solid #0e6b57" : "1px solid #cbd5e1",
-                  background: modalidade === "reduzida_70" ? "#e6f4f1" : "#ffffff",
-                  color: modalidade === "reduzida_70" ? "#0e6b57" : "#64748b",
                 }}
               >
-                70% até contemplar
+                ⭐ Reduzida 70%
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Resultados e Comparativo Financeiro */}
+      {/* Cartão de Resultado */}
       <div
         style={{
-          background: "linear-gradient(135deg, #0e6b57 0%, #08493b 100%)",
+          background: "linear-gradient(135deg, #121212 0%, #2B2B2B 100%)",
+          color: "#ffffff",
           borderRadius: "16px",
           padding: "28px",
-          color: "#ffffff",
-          marginBottom: "32px",
+          marginBottom: "28px",
         }}
       >
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "24px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "20px" }}>
           <div>
-            <div style={{ fontSize: "13px", textTransform: "uppercase", letterSpacing: "1px", opacity: 0.85 }}>
-              Parcela Estimada no Consórcio
+            <span style={{ fontSize: "13px", color: "#cbd5e1" }}>
+              {modalidade === "reduzida_70" ? "Parcela Reduzida (até contemplação):" : "Parcela Mensal Estimada:"}
+            </span>
+            <div style={{ fontSize: "38px", fontWeight: "800", color: "#C6A15B", margin: "4px 0" }}>
+              {formatarMoeda(parcelaExibida)}
             </div>
-            <div style={{ fontSize: "36px", fontWeight: "900", margin: "6px 0" }}>
-              {formatarMoeda(
-                modalidade === "reduzida_70" && resultado.parcelaReduzidaMensal
-                  ? resultado.parcelaReduzidaMensal
-                  : resultado.parcelaIntegralMensal,
-              )}
-              <span style={{ fontSize: "16px", fontWeight: "500" }}>/mês</span>
-            </div>
-            {modalidade === "reduzida_70" && (
-              <div style={{ fontSize: "12px", opacity: 0.9 }}>
-                * Parcela reduzida de 70% até a contemplação. Integral: {formatarMoeda(resultado.parcelaIntegralMensal)}
-                /mês.
-              </div>
-            )}
-            <div style={{ fontSize: "13px", marginTop: "10px", opacity: 0.9 }}>
-              Taxa de administração: {formatarPercentual(resultado.taxaAdmTotalPct)} total diluída (apenas{" "}
-              {formatarPercentual(resultado.taxaAdmMensalPct, 3)}/mês). Sem juros!
-            </div>
+            <span style={{ fontSize: "12px", color: "#cbd5e1" }}>
+              Tx. Adm Total: {formatarPercentual(resultado.taxaAdmTotalPct)} ({formatarPercentual(resultado.taxaAdmTotalPct / (prazoMeses / 12))}/ano)
+            </span>
           </div>
 
-          <div
-            style={{
-              background: "rgba(255, 255, 255, 0.12)",
-              padding: "20px",
-              borderRadius: "12px",
-              border: "1px solid rgba(255, 255, 255, 0.2)",
-            }}
-          >
-            <div style={{ fontSize: "13px", textTransform: "uppercase", letterSpacing: "1px", opacity: 0.85 }}>
-              Economia Real vs Financiamento
-            </div>
-            <div style={{ fontSize: "30px", fontWeight: "900", color: "#5eead4", margin: "6px 0" }}>
+          <div style={{ borderLeft: "1px solid rgba(255,255,255,0.15)", paddingLeft: "16px" }}>
+            <span style={{ fontSize: "13px", color: "#cbd5e1" }}>Economia vs Financiamento Bancário:</span>
+            <div style={{ fontSize: "28px", fontWeight: "800", color: "#4ade80", margin: "4px 0" }}>
               {formatarMoeda(resultado.comparativoFinanciamento.economiaConsorcioValor)}
             </div>
-            <div style={{ fontSize: "13px", opacity: 0.9 }}>
-              Você economiza cerca de {resultado.comparativoFinanciamento.economiaConsorcioPercentual.toFixed(1)}% do
-              valor total que pagaria em juros para o banco!
-            </div>
-          </div>
-
-          <div
-            style={{
-              background: "rgba(255, 255, 255, 0.12)",
-              padding: "20px",
-              borderRadius: "12px",
-              border: "1px solid rgba(255, 255, 255, 0.2)",
-            }}
-          >
-            <div style={{ fontSize: "13px", textTransform: "uppercase", letterSpacing: "1px", opacity: 0.85 }}>
-              Lance Embutido Permitido
-            </div>
-            <div style={{ fontSize: "28px", fontWeight: "800", margin: "6px 0" }}>
-              Até {formatarMoeda(resultado.lanceEmbutidoMaximo.valorMaximoLance)}
-            </div>
-            <div style={{ fontSize: "12px", opacity: 0.9 }}>
-              Você pode ofertar até 30% da própria carta para acelerar sua contemplação sem tirar dinheiro do bolso.
-            </div>
+            <span style={{ fontSize: "12px", color: "#cbd5e1" }}>
+              Você deixa de pagar {formatarPercentual(resultado.comparativoFinanciamento.economiaConsorcioPercentual)} em juros
+            </span>
           </div>
         </div>
+      </div>
 
-        <div style={{ textAlign: "center", marginTop: "28px" }}>
-          <a
-            href={linkWhatsapp}
-            target="_blank"
-            rel="noopener noreferrer"
+      {/* Formulário de Envio para WhatsApp */}
+      <form
+        onSubmit={enviarWhatsApp}
+        style={{
+          background: "#F7F3EA",
+          border: "1px solid #E5DFC9",
+          borderRadius: "12px",
+          padding: "20px",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+          gap: "12px",
+          alignItems: "center",
+        }}
+      >
+        <div>
+          <label style={{ fontSize: "12px", fontWeight: "600", color: "#121212", display: "block", marginBottom: "4px" }}>
+            Seu Nome
+          </label>
+          <input
+            type="text"
+            required
+            placeholder="Nome completo"
+            value={nomeLead}
+            onChange={(e) => setNomeLead(e.target.value)}
+            style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "14px", boxSizing: "border-box" }}
+          />
+        </div>
+        <div>
+          <label style={{ fontSize: "12px", fontWeight: "600", color: "#121212", display: "block", marginBottom: "4px" }}>
+            Seu WhatsApp
+          </label>
+          <input
+            type="tel"
+            required
+            placeholder="(65) 99999-9999"
+            value={telefoneLead}
+            onChange={(e) => setTelefoneLead(e.target.value)}
+            style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "14px", boxSizing: "border-box" }}
+          />
+        </div>
+        <div style={{ display: "flex", alignItems: "flex-end" }}>
+          <button
+            type="submit"
             style={{
-              display: "inline-block",
-              background: "#25d366",
+              width: "100%",
+              background: "#25D366",
               color: "#ffffff",
-              padding: "16px 36px",
-              borderRadius: "50px",
-              fontSize: "17px",
+              border: "none",
+              borderRadius: "8px",
+              padding: "12px",
               fontWeight: "700",
-              textDecoration: "none",
-              boxShadow: "0 10px 25px rgba(37, 211, 102, 0.35)",
-              transition: "transform 0.2s ease",
+              fontSize: "14px",
+              cursor: "pointer",
+              boxShadow: "0 4px 12px rgba(37, 211, 102, 0.3)",
             }}
           >
-            Solicitar Esta Proposta no WhatsApp Oficial
-          </a>
+            {leadEnviado ? "✓ Proposta Enviada!" : "Receber Proposta no WhatsApp"}
+          </button>
         </div>
-      </div>
-
-      {/* Formulário Rápido de Consultoria */}
-      <div style={{ background: "#f8fafc", padding: "24px", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
-        <h3 style={{ fontSize: "18px", fontWeight: "700", color: "#1e293b", margin: "0 0 8px 0" }}>
-          Prefere que nossa assessoria entre em contato com você?
-        </h3>
-        <p style={{ fontSize: "14px", color: "#64748b", margin: "0 0 16px 0" }}>
-          Nossos consultores analisarão os grupos abertos com menor índice de lances para a sua faixa de crédito.
-        </p>
-
-        {enviado ? (
-          <div style={{ background: "#ecfdf5", color: "#065f46", padding: "16px", borderRadius: "8px", fontWeight: "600" }}>
-            Obrigado, {nome}! Sua solicitação foi recebida e nossa equipe entrará em contato em breve.
-          </div>
-        ) : (
-          <form
-            onSubmit={handleSubmitLead}
-            style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "12px" }}
-          >
-            <input
-              type="text"
-              placeholder="Seu nome completo"
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
-              required
-              style={{ padding: "12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "14px" }}
-            />
-            <input
-              type="tel"
-              placeholder="Seu WhatsApp (com DDD)"
-              value={telefone}
-              onChange={(e) => setTelefone(e.target.value)}
-              required
-              style={{ padding: "12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "14px" }}
-            />
-            <button
-              type="submit"
-              style={{
-                background: "#0e6b57",
-                color: "#ffffff",
-                padding: "12px 24px",
-                borderRadius: "8px",
-                fontWeight: "700",
-                fontSize: "14px",
-                border: "none",
-                cursor: "pointer",
-              }}
-            >
-              Receber Estudo de Grupos
-            </button>
-          </form>
-        )}
-      </div>
+      </form>
     </div>
   );
 };

@@ -7,14 +7,16 @@
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "build": "vite build && mkdir -p dist/plataforma/site && cp dist/index.html dist/plataforma/site/index.html"
+    "build": "vite build && mkdir -p dist/plataforma/site dist/plataforma/imoveis dist/plataforma/vistorias dist/plataforma/contratos dist/plataforma/crm dist/plataforma/consorcios dist/imoveis dist/consorcios && cp dist/index.html dist/plataforma/index.html && cp dist/index.html dist/plataforma/site/index.html && cp dist/index.html dist/plataforma/imoveis/index.html && cp dist/index.html dist/plataforma/vistorias/index.html && cp dist/index.html dist/plataforma/contratos/index.html && cp dist/index.html dist/plataforma/crm/index.html && cp dist/index.html dist/plataforma/consorcios/index.html && cp dist/index.html dist/imoveis/index.html && cp dist/index.html dist/consorcios/index.html"
   },
   "dependencies": {
     "lucide-react": "^1.16.0",
+    "qrcode": "^1.5.4",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },
   "devDependencies": {
+    "@types/qrcode": "^1.5.6",
     "@types/react": "^19.3.2",
     "@types/react-dom": "^19.3.0",
     "typescript": "^5.9.0",

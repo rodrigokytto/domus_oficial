@@ -3,12 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Domus Consórcios & Soluções Financeiras · Conquiste seu Patrimônio sem Juros</title>
+    <title>Gama Patrimonial · Domus | Inteligência Imobiliária & Soluções Financeiras</title>
     <meta
       name="description"
-      content="Plataforma oficial da Domus Consórcios. Simule consórcios imobiliários, pesados/agro, veículos e serviços com as menores taxas do mercado e economia real frente ao financiamento bancário."
+      content="Plataforma oficial da Gama Patrimonial e Domus Consórcios. Imóveis de alto padrão, fazendas no Mato Grosso, simulações de financiamento SAC/PRICE, vistorias eletrônicas e consórcios homologados pelo BACEN em Tangará da Serra - MT. CRECI J-14280."
     />
-    <meta name="theme-color" content="#0e6b57" />
+    <meta name="theme-color" content="#121212" />
+    <link rel="icon" type="image/svg+xml" href="/marcas/gama/favicon.svg" />
+    <link rel="apple-touch-icon" href="/marcas/gama/apple-touch-icon.png" />
+    <link rel="manifest" href="/marcas/gama/manifest.webmanifest" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -17,14 +20,15 @@
     />
     <style>
       :root {
-        --verde-domus: #0e6b57;
-        --verde-escuro: #094739;
-        --verde-claro: #e6f4f1;
-        --dourado-domus: #d99b26;
-        --grafite: #1e293b;
-        --cinza-texto: #475569;
-        --cinza-fundo: #f8fafc;
-        --branco: #ffffff;
+        --gama-preto: #121212;
+        --gama-grafite: #2b2b2b;
+        --gama-dourado: #c6a15b;
+        --gama-dourado-hover: #d4b36a;
+        --gama-dourado-dark: #a5823d;
+        --gama-fundo: #f7f3ea;
+        --gama-borda: #e5dfc9;
+        --gama-branco: #ffffff;
+        --gama-cinza-texto: #64748b;
       }
       * {
         box-sizing: border-box;
@@ -33,8 +37,8 @@
       }
       body {
         font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        color: var(--grafite);
-        background-color: var(--cinza-fundo);
+        color: var(--gama-preto);
+        background-color: #f8fafc;
         line-height: 1.6;
         -webkit-font-smoothing: antialiased;
       }
@@ -44,6 +48,21 @@
       }
       button {
         font-family: inherit;
+      }
+      @media print {
+        body {
+          background: #ffffff !important;
+        }
+        header, footer, nav, button, .no-print {
+          display: none !important;
+        }
+        #folha-paper-pdf-a4 {
+          box-shadow: none !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          width: 100% !important;
+          max-width: 100% !important;
+        }
       }
     </style>
   </head>

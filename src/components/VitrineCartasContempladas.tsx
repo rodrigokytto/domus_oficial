@@ -1,103 +1,178 @@
-import React from "react";
-import { formatarMoeda } from "../lib/motor-consorcios";
-import type { CartaContemplada } from "../types/consorcio";
+import type React from "react";
+import { useState } from "react";
+import { formatarMoeda, TABELAS_ADMINISTRADORAS } from "../lib/motor-consorcios";
+import type { CartaContemplada, CategoriaConsorcio } from "../types/consorcio";
+import { MARCA_GAMA } from "../lib/marcaGama";
 
-interface VitrineProps {
-  cartas?: CartaContemplada[];
-  telefoneWhatsappPadrao?: string;
-}
-
-const CARTAS_EXEMPLO: CartaContemplada[] = [
+const CARTAS_DISPONIVEIS: CartaContemplada[] = [
   {
-    id: "c1",
-    codigo: "DOM-IMOB-850K",
-    categoria: "imobiliario",
-    administradora: "caixa_consorcios",
-    valorCredito: 850_000,
-    valorEntradaAgio: 195_000,
-    saldoDevedor: 715_000,
-    parcelasRestantes: 184,
-    valorParcelaMensal: 3_885.86,
-    status: "disponivel",
-    destaque: true,
-    observacoes: "Cota contemplada liberada para compra de casa, apartamento, terreno ou construção em Tangará e MT.",
-  },
-  {
-    id: "c2",
-    codigo: "DOM-AGRO-1200K",
-    categoria: "pesados_agro",
-    administradora: "rodobens",
-    valorCredito: 1_200_000,
-    valorEntradaAgio: 280_000,
-    saldoDevedor: 1_010_000,
-    parcelasRestantes: 96,
-    valorParcelaMensal: 10_520.83,
-    status: "disponivel",
-    destaque: true,
-    observacoes: "Ideal para trator, colheitadeira ou caminhão bitrem. Faturamento direto pela concessionária.",
-  },
-  {
-    id: "c3",
-    codigo: "DOM-AUTO-140K",
-    categoria: "veiculo_leve",
+    id: "carta-01",
+    codigo: "CT101",
     administradora: "porto_seguro",
-    valorCredito: 140_000,
-    valorEntradaAgio: 38_000,
-    saldoDevedor: 114_000,
-    parcelasRestantes: 62,
-    valorParcelaMensal: 1_838.70,
+    categoria: "imobiliario",
+    valorCredito: 650_000,
+    valorEntradaAgio: 185_000,
+    saldoDevedor: 512_000,
+    parcelasRestantes: 172,
+    valorParcelaMensal: 3_840,
+    status: "disponivel",
+    destaque: true,
+  },
+  {
+    id: "carta-02",
+    codigo: "CT102",
+    administradora: "caixa_consorcios",
+    categoria: "imobiliario",
+    valorCredito: 400_000,
+    valorEntradaAgio: 110_000,
+    saldoDevedor: 318_000,
+    parcelasRestantes: 154,
+    valorParcelaMensal: 2_420,
     status: "disponivel",
     destaque: false,
-    observacoes: "Crédito para compra de automóvel novo ou seminovo nacional ou importado.",
   },
   {
-    id: "c4",
-    codigo: "DOM-IMOB-450K",
-    categoria: "imobiliario",
-    administradora: "santander",
-    valorCredito: 450_000,
-    valorEntradaAgio: 115_000,
-    saldoDevedor: 380_000,
-    parcelasRestantes: 160,
-    valorParcelaMensal: 2_375.00,
+    id: "carta-03",
+    codigo: "CT103",
+    administradora: "rodobens",
+    categoria: "pesados_agro",
+    valorCredito: 950_000,
+    valorEntradaAgio: 280_000,
+    saldoDevedor: 740_000,
+    parcelasRestantes: 98,
+    valorParcelaMensal: 8_750,
     status: "disponivel",
     destaque: true,
-    observacoes: "Excelente oportunidade para aquisição de primeiro imóvel ou reforma com liberação imediata.",
+  },
+  {
+    id: "carta-04",
+    codigo: "CT104",
+    administradora: "itau",
+    categoria: "veiculo_leve",
+    valorCredito: 120_000,
+    valorEntradaAgio: 38_000,
+    saldoDevedor: 92_000,
+    parcelasRestantes: 64,
+    valorParcelaMensal: 1_650,
+    status: "disponivel",
+    destaque: false,
+  },
+  {
+    id: "carta-05",
+    codigo: "CT105",
+    administradora: "santander",
+    categoria: "pesados_agro",
+    valorCredito: 1_500_000,
+    valorEntradaAgio: 450_000,
+    saldoDevedor: 1_180_000,
+    parcelasRestantes: 112,
+    valorParcelaMensal: 12_400,
+    status: "disponivel",
+    destaque: true,
   },
 ];
 
+interface VitrineProps {
+  telefoneWhatsappPadrao?: string;
+}
+
 export const VitrineCartasContempladas: React.FC<VitrineProps> = ({
-  cartas = CARTAS_EXEMPLO,
-  telefoneWhatsappPadrao = "5565999025800",
+  telefoneWhatsappPadrao = MARCA_GAMA.telefoneWhatsapp,
 }) => {
+  const [filtroCategoria, setFiltroCategoria] = useState<string>("todas");
+
+  const cartasFiltradas = CARTAS_DISPONIVEIS.filter((c) => {
+    if (filtroCategoria === "todas") return true;
+    return c.categoria === filtroCategoria;
+  });
+
+  const reservarCarta = (carta: CartaContemplada) => {
+    const nomeAdm = TABELAS_ADMINISTRADORAS[carta.administradora]?.nome ?? carta.administradora;
+    const texto = encodeURIComponent(
+      `Olá! Tenho interesse na *Carta Contemplada ${carta.codigo}* da Gama & Domus Consórcios:\n` +
+        `• Administradora: ${nomeAdm}\n` +
+        `• Crédito Liberado: ${formatarMoeda(carta.valorCredito)}\n` +
+        `• Entrada / Ágio: ${formatarMoeda(carta.valorEntradaAgio)}\n` +
+        `• Saldo Devedor: ${carta.parcelasRestantes}x de ${formatarMoeda(carta.valorParcelaMensal)}\n\n` +
+        `Gostaria de verificar a documentação e disponibilidade para transferência imediata.`,
+    );
+    window.open(`https://wa.me/${telefoneWhatsappPadrao}?text=${texto}`, "_blank");
+  };
+
   return (
     <div style={{ marginTop: "40px" }}>
-      <div style={{ textAlign: "center", marginBottom: "28px" }}>
-        <h3 style={{ fontSize: "26px", fontWeight: "800", color: "#1e293b", margin: "0 0 8px 0" }}>
-          Cartas Contempladas Disponíveis
-        </h3>
-        <p style={{ color: "#64748b", fontSize: "15px", maxWidth: "700px", margin: "0 auto" }}>
-          Para quem tem urgência e quer o bem agora: créditos aprovados e contemplados prontos para transferência
-          imediata mediante entrada (ágio) e assunção das parcelas restantes.
-        </p>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: "16px",
+          marginBottom: "24px",
+        }}
+      >
+        <div>
+          <span
+            style={{
+              background: "#F7F3EA",
+              color: "#C6A15B",
+              padding: "4px 10px",
+              borderRadius: "20px",
+              fontSize: "12px",
+              fontWeight: "800",
+              textTransform: "uppercase",
+              border: "1px solid #E5DFC9",
+            }}
+          >
+            DISPONIBILIDADE IMEDIATA
+          </span>
+          <h3 style={{ fontSize: "26px", fontWeight: "800", color: "#121212", margin: "6px 0 2px 0" }}>
+            Cartas de Crédito Já Contempladas
+          </h3>
+          <p style={{ color: "#64748b", fontSize: "14px", margin: 0 }}>
+            Compre seu imóvel, maquinário ou frota hoje mesmo sem esperar sorteio ou lance
+          </p>
+        </div>
+
+        {/* Filtro de Categoria */}
+        <div style={{ display: "flex", gap: "8px" }}>
+          {[
+            { id: "todas", label: "Todas" },
+            { id: "imobiliario", label: "Imobiliário" },
+            { id: "pesados_agro", label: "Agro & Pesados" },
+            { id: "veiculo_leve", label: "Veículos" },
+          ].map((f) => (
+            <button
+              key={f.id}
+              type="button"
+              onClick={() => setFiltroCategoria(f.id)}
+              style={{
+                background: filtroCategoria === f.id ? "#121212" : "#f1f5f9",
+                color: filtroCategoria === f.id ? "#ffffff" : "#475569",
+                border: "none",
+                borderRadius: "8px",
+                padding: "8px 14px",
+                fontSize: "13px",
+                fontWeight: "600",
+                cursor: "pointer",
+              }}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
       </div>
 
+      {/* Grid de Cartas */}
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(290px, 1fr))",
           gap: "20px",
         }}
       >
-        {cartas.map((c) => {
-          const textoWpp = encodeURIComponent(
-            `Olá! Tenho interesse na Carta Contemplada ${c.codigo} (${c.categoria}) de crédito ${formatarMoeda(
-              c.valorCredito,
-            )} com entrada de ${formatarMoeda(c.valorEntradaAgio)} e ${c.parcelasRestantes}x de ${formatarMoeda(
-              c.valorParcelaMensal,
-            )}. Como podemos formalizar a transferência?`,
-          );
-          const link = `https://wa.me/${telefoneWhatsappPadrao}?text=${textoWpp}`;
+        {cartasFiltradas.map((c) => {
+          const nomeAdm = TABELAS_ADMINISTRADORAS[c.administradora]?.nome ?? c.administradora;
 
           return (
             <div
@@ -106,83 +181,100 @@ export const VitrineCartasContempladas: React.FC<VitrineProps> = ({
                 background: "#ffffff",
                 borderRadius: "14px",
                 padding: "24px",
-                border: c.destaque ? "2px solid #0e6b57" : "1px solid #e2e8f0",
-                boxShadow: c.destaque ? "0 8px 24px rgba(14, 107, 87, 0.12)" : "0 2px 8px rgba(0,0,0,0.04)",
+                border: c.destaque ? "2px solid #C6A15B" : "1px solid #E5DFC9",
+                boxShadow: c.destaque ? "0 10px 25px -5px rgba(198, 161, 91, 0.2)" : "0 4px 6px -1px rgba(0, 0, 0, 0.05)",
+                position: "relative",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-between",
               }}
             >
+              {c.destaque && (
+                <span
+                  style={{
+                    position: "absolute",
+                    top: "-10px",
+                    right: "16px",
+                    background: "#C6A15B",
+                    color: "#121212",
+                    fontSize: "10px",
+                    fontWeight: "800",
+                    padding: "2px 8px",
+                    borderRadius: "10px",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Oportunidade Prime
+                </span>
+              )}
+
               <div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
                   <span
                     style={{
-                      background: "#e6f4f1",
-                      color: "#0e6b57",
-                      padding: "4px 10px",
-                      borderRadius: "6px",
-                      fontSize: "12px",
+                      background: "#F7F3EA",
+                      color: "#121212",
+                      fontSize: "11px",
                       fontWeight: "700",
-                      textTransform: "uppercase",
+                      padding: "3px 8px",
+                      borderRadius: "6px",
                     }}
                   >
-                    {c.categoria.replace("_", " ")}
+                    {nomeAdm}
                   </span>
-                  <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "600" }}>{c.codigo}</span>
+                  <span style={{ fontSize: "11px", color: "#64748b" }}>Cód. {c.codigo}</span>
                 </div>
 
-                <div style={{ fontSize: "13px", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                <span style={{ fontSize: "12px", color: "#64748b", textTransform: "uppercase", fontWeight: "600" }}>
                   Crédito Disponível
-                </div>
-                <div style={{ fontSize: "28px", fontWeight: "800", color: "#0e6b57", margin: "4px 0 16px 0" }}>
+                </span>
+                <div style={{ fontSize: "28px", fontWeight: "800", color: "#121212", margin: "4px 0 16px 0" }}>
                   {formatarMoeda(c.valorCredito)}
                 </div>
 
-                <div style={{ background: "#f8fafc", padding: "14px", borderRadius: "10px", marginBottom: "16px" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", marginBottom: "6px" }}>
+                <div
+                  style={{
+                    background: "#f8fafc",
+                    borderRadius: "8px",
+                    padding: "12px",
+                    fontSize: "13px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "8px",
+                    marginBottom: "20px",
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between" }}>
                     <span style={{ color: "#64748b" }}>Entrada (Ágio):</span>
-                    <strong style={{ color: "#1e293b" }}>{formatarMoeda(c.valorEntradaAgio)}</strong>
+                    <span style={{ fontWeight: "700", color: "#121212" }}>{formatarMoeda(c.valorEntradaAgio)}</span>
                   </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", marginBottom: "6px" }}>
-                    <span style={{ color: "#64748b" }}>Parcelas a assumir:</span>
-                    <strong style={{ color: "#1e293b" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <span style={{ color: "#64748b" }}>Saldo Devedor:</span>
+                    <span style={{ fontWeight: "600", color: "#334155" }}>
                       {c.parcelasRestantes}x de {formatarMoeda(c.valorParcelaMensal)}
-                    </strong>
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
-                    <span style={{ color: "#64748b" }}>Administradora:</span>
-                    <strong style={{ color: "#1e293b", textTransform: "capitalize" }}>
-                      {c.administradora.replace("_", " ")}
-                    </strong>
+                    </span>
                   </div>
                 </div>
-
-                {c.observacoes && (
-                  <p style={{ fontSize: "12px", color: "#64748b", lineHeight: "1.4", margin: "0 0 16px 0" }}>
-                    {c.observacoes}
-                  </p>
-                )}
               </div>
 
-              <a
-                href={link}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
+                onClick={() => reservarCarta(c)}
                 style={{
-                  display: "block",
-                  textAlign: "center",
-                  background: "#0e6b57",
-                  color: "#ffffff",
-                  padding: "12px 20px",
+                  width: "100%",
+                  background: "#121212",
+                  color: "#C6A15B",
+                  border: "1px solid #C6A15B",
+                  padding: "12px",
                   borderRadius: "8px",
-                  fontSize: "14px",
                   fontWeight: "700",
-                  textDecoration: "none",
-                  transition: "background 0.2s ease",
+                  fontSize: "13px",
+                  cursor: "pointer",
+                  transition: "background 0.2s",
                 }}
               >
-                Quero Esta Carta Contemplada
-              </a>
+                Reservar Carta Contemplada
+              </button>
             </div>
           );
         })}
