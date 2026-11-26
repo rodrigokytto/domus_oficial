@@ -7,7 +7,7 @@
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "build": "vite build"
+    "build": "vite build && mkdir -p dist/plataforma/site && cp dist/index.html dist/plataforma/site/index.html"
   },
   "dependencies": {
     "lucide-react": "^1.16.0",
