@@ -210,6 +210,8 @@ export function calcularSimulacaoConsorcio(entrada: SimulacaoEntrada): Simulacao
   };
 }
 
+export const simularConsorcio = calcularSimulacaoConsorcio;
+
 /** Formata valor numérico como moeda corrente nacional BRL. */
 export function formatarMoeda(valor: number): string {
   return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
