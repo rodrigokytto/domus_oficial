@@ -18,7 +18,7 @@
 **Sede Corporativa:** Av. Brasil, 1250, Centro, Tangará da Serra - MT, CEP 78300-000 | Código IBGE: 5107958  
 **Ambiente Oficial de Produção:** Google Cloud Platform (Cloud Run: `domus-site`, região `us-central1`)  
 **Portal Oficial:** [https://gamapatrimonial.com.br](https://gamapatrimonial.com.br) | **Plataforma:** [https://gamapatrimonial.com.br/plataforma](https://gamapatrimonial.com.br/plataforma)  
-**Data de Emissão:** 27 de Novembro de 2026 | Versão: 2.5.0-PRD
+**Data de Emissão:** 27 de Novembro de 2026 | Versão: 4.0.0-PRD Ultra-Consolidada Definitiva
 
 ---
 
@@ -319,6 +319,14 @@ A plataforma **Gama Patrimonial** é executada em regime de alta disponibilidade
 
 *Figura 1 — Topologia de Nuvem e Microsserviços da Plataforma Gama Patrimonial no Google Cloud Platform.*
 
+
+<div style="page-break-inside: avoid; break-inside: avoid; margin-top: 18px; margin-bottom: 24px; text-align: center;">
+  <img src="/home/ubuntu/repos/domus_oficial/docs/manual_ativos/diagrama_arquitetura_gcp_cloudrun.png" alt="Figura 22 — Arquitetura GCP Cloud Run" style="max-height: 420px; max-width: 95%; margin: 0 auto; border: 1px solid #d1c7b7; border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.08);" />
+  <p style="font-size: 0.88rem; font-style: italic; color: #333; margin-top: 8px; line-height: 1.4;">
+    <strong>Figura 22</strong> — Diagrama de Arquitetura de Produção no Google Cloud Run: Topologia Anycast, Cloudflare TLS 1.3, microsserviço domus-site, Cloud Storage, Secret Manager e PostgreSQL 16 Enterprise.
+  </p>
+</div>
+
 ### 2.2 Stack Tecnológica: React 19, TypeScript, Fastify e Canvas Engine
 
 O ecossistema foi construído sobre uma arquitetura de monorepo moderno gerenciada pelo Turbo e pnpm:
@@ -383,6 +391,14 @@ Cada imagem capturada é submetida a um pipeline de pós-processamento gráfico 
 - **Estampa Cronológica Oficial:** Data e Hora com fuso UTC-4 (Mato Grosso) e precisão de segundos;
 - **Localização Geográfica:** Coordenadas GPS (Latitude/Longitude), Bairro e Município ("Jardim Europa, Tangará da Serra - MT");
 - **Selo Criptográfico:** Hash SHA-256 truncado para exibição visual (`SHA256: e8b4a9...`) e armazenado integralmente na trilha de auditoria do banco de dados.
+
+
+<div style="page-break-inside: avoid; break-inside: avoid; margin-top: 18px; margin-bottom: 24px; text-align: center;">
+  <img src="/home/ubuntu/repos/domus_oficial/docs/manual_ativos/diagrama_vistoria_webrtc_forense.png" alt="Figura 25 — Sequência Vistoria WebRTC" style="max-height: 420px; max-width: 95%; margin: 0 auto; border: 1px solid #d1c7b7; border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.08);" />
+  <p style="font-size: 0.88rem; font-style: italic; color: #333; margin-top: 8px; line-height: 1.4;">
+    <strong>Figura 25</strong> — Diagrama de Sequência da Vistoria Pericial Forense: Fluxo de chamada getUserMedia WebRTC, captura em Canvas Retina 60 FPS, carimbo forense GPS/UTC-4, hash SHA-256 e selagem ICP-Brasil.
+  </p>
+</div>
 
 ### 3.4 Modal de Assinatura Touch em Tela via Canvas Capacitivo com Alta Densidade
 
@@ -510,6 +526,14 @@ O ciclo de vida da locação imobiliária na Gama Patrimonial estrutura-se em ci
 4. **Emissão da Minuta e Validação de Guardrails Jurídicos por IA:** Compilação das cláusulas contratuais pelo motor `@plataforma/mod-construtora`, cálculo dos limites legais da garantia e auditoria de conformidade;
 5. **Homologação Executiva e Assinatura Digital Multicanal:** Despacho favorável da diretoria executiva e envio automatizado de links de assinatura com autenticação biométrica, WhatsApp e e-mail criptográfico para todos os signatários.
 
+
+<div style="page-break-inside: avoid; break-inside: avoid; margin-top: 18px; margin-bottom: 24px; text-align: center;">
+  <img src="/home/ubuntu/repos/domus_oficial/docs/manual_ativos/diagrama_ciclo_locacao_bpmn.png" alt="Figura 23 — BPMN Locação Residencial" style="max-height: 420px; max-width: 95%; margin: 0 auto; border: 1px solid #d1c7b7; border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.08);" />
+  <p style="font-size: 0.88rem; font-style: italic; color: #333; margin-top: 8px; line-height: 1.4;">
+    <strong>Figura 23</strong> — Diagrama BPMN do Ciclo de Locação Residencial Urbana (Lei 8.245/1991): Captação, Análise IA de Crédito, Caução Segregada 3x, Aprovação Executiva e Integração com o Razão Contábil Kytto.
+  </p>
+</div>
+
 ### 4.2 Modalidades de Garantia Locatícia e Regras Paramétricas
 
 Em consonância com o artigo 37 e parágrafo único da Lei Federal nº 8.245/1991, **é vedada a exigência de mais de uma modalidade de garantia** sob o mesmo contrato de locação, sob pena de nulidade da garantia excedente e configuração de contravenção penal (Art. 43, II).
@@ -616,6 +640,14 @@ A minuta parametrizada na plataforma Gama Patrimonial contempla:
 - **Art. 474 e 475 do Código Civil (Cláusula Resolutiva Expressa):** Estabelecimento de rescisão automática de pleno direito em caso de inadimplemento do saldo final do preço após notificação prévia de 15 dias (Decreto-Lei nº 745/1969);
 - **Art. 447 a 457 do Código Civil (Da Evicção):** Cláusula assecuratória da responsabilidade dos promitentes vendedores pelos riscos de evicção e declaração expressa de inexistência de penhoras, hipotecas judiciais ou ações reipersecutórias.
 
+
+<div style="page-break-inside: avoid; break-inside: avoid; margin-top: 18px; margin-bottom: 24px; text-align: center;">
+  <img src="/home/ubuntu/repos/domus_oficial/docs/manual_ativos/diagrama_ciclo_venda_bpmn.png" alt="Figura 24 — BPMN Compra e Venda" style="max-height: 420px; max-width: 95%; margin: 0 auto; border: 1px solid #d1c7b7; border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.08);" />
+  <p style="font-size: 0.88rem; font-style: italic; color: #333; margin-top: 8px; line-height: 1.4;">
+    <strong>Figura 24</strong> — Diagrama BPMN do Ciclo de Promessa de Compra e Venda (Art. 481 e 474 CC): Proposta, Due Diligence Registral, Arras Confirmatórias (R$ 170k), Saldo Financiado (R$ 680k) e Repasses.
+  </p>
+</div>
+
 ### 5.2 Estrutura da Minuta: Sinal/Arras, Saldo Financiado e Certidões de Evicção
 
 A minuta gerada para compra e venda divide o plano financeiro em:
@@ -701,6 +733,30 @@ A simulação integral do processo de compra e venda foi executada e homologada 
 
 <div style="page-break-after: always;"></div>
 
+
+---
+
+## 5.6 VALIDADOR PÚBLICO DE AUTENTICIDADE CRIPTOGRÁFICA & CERTIDÃO DIGITAL
+
+Para assegurar transparência pública, eficácia perante serventias extrajudiciais (cartórios de notas e de registro de imóveis) e cumprimento integral do Art. 5º, § 1º da Lei Federal nº 14.063/2020 e da MP 2.200-2/2001, a plataforma implementa o **Validador Criptográfico Público** (`ValidadorCriptograficoModal.tsx`).
+
+O validador está acessível diretamente no ecossistema e através do endereço público oficial:
+- **URL Pública do Validador:** [https://gamapatrimonial.com.br/plataforma/validar](https://gamapatrimonial.com.br/plataforma/validar)
+
+### Mecanismo de Consulta e Prova de Não-Adulteração
+Qualquer terceiro (advogado, magistrado, tabelião, cliente ou perito) pode inserir o **Hash SHA-256** (64 caracteres hexadecimais), o protocolo ou o número do contrato. O motor de auditoria valida:
+1. A correspondência exata do resumo matemático com o artefato original preservado em armazenamento imutável;
+2. A integridade do carimbo de tempo **RFC 3161** sincronizado com o meridiano de Mato Grosso (UTC-4);
+3. A lista completa de signatários com seus papéis, canais de verificação (Touch Screen, WhatsApp OTP, E-mail) e hashes individuais;
+4. Emissão imediata de **Certidão de Autenticidade Digital** com cabeçalho da Gama Patrimonial e opção de impressão.
+
+<div style="page-break-inside: avoid; break-inside: avoid; margin-top: 18px; margin-bottom: 24px; text-align: center;">
+  <img src="/home/ubuntu/repos/domus_oficial/docs/manual_ativos/diagrama_assinatura_eletronica_camadas.png" alt="Figura 26 — Camadas Criptográficas da Assinatura" style="max-height: 420px; max-width: 95%; margin: 0 auto; border: 1px solid #d1c7b7; border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.08);" />
+  <p style="font-size: 0.88rem; font-style: italic; color: #333; margin-top: 8px; line-height: 1.4;">
+    <strong>Figura 26</strong> — Diagrama de Camadas Criptográficas e Legais da Assinatura Eletrônica Avançada: Coleta de Vontade (Touch/OTP), Integridade SHA-256/RFC 3161, Preservação PAdES/LTV e Amparo na Lei 14.063/2020 e MP 2.200-2/2001.
+  </p>
+</div>
+
 ## 6. INTEGRAÇÃO COM O BACKOFFICE ERP KYTTO E GOVERNANÇA FINANCEIRA
 
 ### 6.1 Razão Universal com Idempotência e Centros de Custo Estruturados
@@ -743,6 +799,41 @@ Conforme a Resolução COFECI nº 1.336/2014 e a Lei Federal nº 9.613/1998, a G
 ---
 
 <div style="page-break-after: always;"></div>
+
+
+---
+
+## 6.5 GOVERNANÇA DE DADOS E CONFORMIDADE LGPD (LEI Nº 13.709/2018)
+
+O tratamento de dados pessoais no âmbito da plataforma Gama Patrimonial atende rigorosamente aos princípios da finalidade, necessidade, transparência e segurança da Lei Geral de Proteção de Dados:
+
+### 1. Bases Legais Aplicadas
+- **Execução de Contrato (Art. 7º, V):** Coleta de qualificação das partes (nome, CPF, RG, profissão, estado civil, domicílio, e-mail) estritamente necessária para a validade formal dos instrumentos jurídicos;
+- **Legítimo Interesse e Proteção Patrimonial (Art. 7º, IX):** Preservação do acervo pericial para salvaguarda de direitos e prevenção a fraudes no setor imobiliário.
+
+### 2. Tratamento de Dados Biométricos Touch
+O traçado manuscrito capturado em tela capacitiva (vetor de pontos Bezier a 60 FPS) é criptograficamente ligado ao hash SHA-256 daquele documento específico e descartado da memória após a renderização do PDF assinado, impedindo reutilização ilícita.
+
+### 3. Privacidade nas Fotografias de Vistorias
+O sistema instrui os peritos a enquadrarem exclusivamente elementos estruturais e de acabamento dos cômodos, vedando a inclusão de retratos familiares, documentos pessoais ou menores. Os arquivos são arquivados com chave segura pelo prazo prescricional de 5 anos (Art. 206, § 3º do Código Civil).
+
+---
+
+## 6.6 MATRIZ DE RISCOS JURÍDICOS E MITIGAÇÕES FORENSES
+
+<div style="font-size: 8.5pt;">
+
+**Tabela 9 — Matriz de Riscos Jurídicos e Mitigações Forenses Aplicadas pela Plataforma**
+
+| Fator de Risco Operacional | Hipótese Jurídica de Conflito | Mitigação Técnica e Jurídica na Plataforma Gama |
+| :--- | :--- | :--- |
+| **Impugnação de Laudo Pericial** | Alegação de que as avarias já existiam na entrada ou que as fotos foram adulteradas. | Carimbo temporal RFC 3161, GPS indelével, hash SHA-256 e comparador IA Entrada x Saída fundamentado na NBR 13.752. |
+| **Nulidade de Garantia Locatícia** | Alegação de dupla garantia vedada pelo Art. 37, parágrafo único da Lei 8.245/1991. | O motor da plataforma valida e bloqueia sistemicamente a inclusão de fiador ou seguro quando a caução em dinheiro estiver ativa. |
+| **Inadimplemento de Aluguel** | Demora na cobrança e perda de eficácia da execução judicial. | Régua de cobrança automática via Asaas (PIX/Boleto), protesto extrajudicial e execução direta de título executivo extrajudicial (Art. 784, III CPC). |
+| **Arrependimento em Compra e Venda** | Desistência da compra após celebração da promessa sem penalidade. | Cláusula resolutiva expressa (Art. 474 CC) e estipulação de arras confirmatórias irrevogáveis e irretratáveis (Art. 418 CC). |
+| **Fraude em Assinatura Digital** | Contestação de autoria por signatário alegando uso indevido de token. | Coleta combinada de IP, User-Agent, validação por SMS/WhatsApp OTP e traçado manuscrito capacitivo touch em tela. |
+
+</div>
 
 ## 7. ESPECIFICAÇÃO DE APIS, SCHEMAS E INTEGRAÇÕES TÉCNICAS
 

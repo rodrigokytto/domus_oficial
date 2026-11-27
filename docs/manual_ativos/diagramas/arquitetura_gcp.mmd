@@ -1,0 +1,45 @@
+graph TD
+    subgraph Internet_Publica["Internet Pública & Usuários"]
+        Client_Mobile["Smartphone / iPhone iOS PWA<br/>(Câmera WebRTC + Touch Screen)"]
+        Client_Desktop["Desktop / Web Browser<br/>(Chrome / Safari / Firefox)"]
+        Cartorio["Cartórios & Bancos<br/>(Validador Público SHA-256)"]
+    end
+
+    subgraph CDN_Security["Borda, Segurança & DNS"]
+        Cloudflare["Cloudflare / Cloud DNS<br/>HTTPS TLS 1.3 / WAF Anti-DDoS"]
+        Dominio["gamapatrimonial.com.br<br/>(Domínio Autorizado)"]
+    end
+
+    subgraph GCP_Project["Google Cloud Platform — kytto-514916 (us-central1)"]
+        subgraph CloudRun["Cloud Run (Serverless Container Autoscaling)"]
+            Service_Site["domus-site:latest<br/>(Node.js 22 LTS / Fastify 4 / React 19)"]
+            Service_Worker["Background Job Worker<br/>(Processamento Assíncrono)"]
+        end
+
+        subgraph Storage_Layer["Camada de Armazenamento & Persistência"]
+            Cloud_Storage["Cloud Storage (GCS)<br/>• Fotos Periciais Forenses<br/>• Minutas PDF Assinadas PAdES"]
+            PostgreSQL["PostgreSQL 16 Enterprise<br/>• Razão Universal Kytto<br/>• Minutas & Assinaturas<br/>• Vistorias & Laudos"]
+        end
+
+        subgraph Security_KMS["Segurança & Segredos"]
+            Secret_Manager["Secret Manager<br/>(Credenciais, Chaves JWT & API Keys)"]
+            KMS_HSM["Cloud KMS (HSM)<br/>(Carimbos RFC 3161 & Hashes SHA-256)"]
+        end
+
+        subgraph Observability["Telemetria & Auditoria"]
+            Cloud_Logging["Cloud Logging<br/>(Trilha de Auditoria Forense)"]
+            Cloud_Monitoring["Cloud Monitoring<br/>(Métricas de SLA 99,9%)"]
+        end
+    end
+
+    Client_Mobile --> Dominio
+    Client_Desktop --> Dominio
+    Cartorio --> Dominio
+    Dominio --> Cloudflare
+    Cloudflare --> Service_Site
+    Service_Site --> Cloud_Storage
+    Service_Site --> PostgreSQL
+    Service_Site --> Secret_Manager
+    Service_Site --> KMS_HSM
+    Service_Site --> Cloud_Logging
+    Service_Site --> Cloud_Monitoring

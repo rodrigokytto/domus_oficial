@@ -1,0 +1,31 @@
+sequenceDiagram
+    autonumber
+    actor Comprador as Comprador (Dr. Rodrigo Gonçalves)
+    actor Vendedor as Vendedor (Guilherme Gama)
+    participant Plataforma as Plataforma Gama Patrimonial
+    participant Juridico as Jurídico & IA Guardrails
+    participant Diretoria as Diretoria Executiva
+    participant Banco as Banco / Financiamento
+    participant ERP as ERP Financeiro Kytto
+
+    Note over Comprador, Plataforma: 1. Proposta & Due Diligence
+    Comprador->>Plataforma: Proposta de Aquisição (R$ 850.000,00)
+    Plataforma->>Juridico: Verificação de Certidões Negativas & Matrícula
+    Juridico-->>Plataforma: Parecer Favorável · Cláusulas Art. 481 e 474 CC
+
+    Note over Plataforma, Diretoria: 2. Minuta de Compra e Venda
+    Plataforma->>Plataforma: Elaboração de Promessa de Compra e Venda (Sinal R$ 170k + Saldo R$ 680k)
+    Plataforma->>Diretoria: Homologação pela Diretoria Executiva
+    Diretoria->>Plataforma: Parecer Executivo Aprovado
+
+    Note over Plataforma, Vendedor: 3. Assinatura Digital do Instrumento Particular
+    Plataforma->>Comprador: Link Seguro de Assinatura Touch / Celular
+    Plataforma->>Vendedor: Link Seguro de Assinatura Touch / Celular
+    Comprador->>Plataforma: Assinatura Eletrônica Registrada (Hash SHA-256)
+    Vendedor->>Plataforma: Assinatura Eletrônica Registrada (Hash SHA-256)
+
+    Note over Plataforma, ERP: 4. Liquidação Financeira & Repasses
+    Comprador->>ERP: Pagamento de Arras / Sinal (R$ 170.000,00)
+    Banco->>ERP: Liberação de Saldo Financiado (R$ 680.000,00)
+    ERP->>ERP: Split: Comissão Corretagem 5% + Repasse Líquido Vendedor
+    ERP->>Plataforma: Emissão de NFS-e e Registro DIMOB Receita Federal

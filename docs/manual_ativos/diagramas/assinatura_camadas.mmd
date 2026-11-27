@@ -1,0 +1,32 @@
+graph TD
+    subgraph Camada_1["1. Camada de Apresentação & Coleta de Vontade"]
+        Touch["Assinatura Touch em Tela (Pointer/TouchEvents)<br/>Buffer Vetorial Bezier 60 FPS"]
+        OTP["Autenticação em Duplo Fator (2FA)<br/>Tokens via WhatsApp & E-mail"]
+        Biometria["Identificação de Dispositivo<br/>IP, User-Agent, Geolocalização GPS"]
+    end
+
+    subgraph Camada_2["2. Camada Criptográfica de Integridade"]
+        SHA256["Função Hash Criptográfica SHA-256 (FIPS 180-4)<br/>Garantia de Não-Adulteração do Documento"]
+        Timestamp["Carimbo de Tempo RFC 3161 (Time-Stamp Protocol)<br/>Fuso Horário UTC-4 (Cuiabá / Tangará da Serra - MT)"]
+    end
+
+    subgraph Camada_3["3. Camada de Embalagem & Preservação Digital"]
+        PAdES["PAdES (PDF Advanced Electronic Signatures)<br/>ISO 32000-1 / ETSI TS 102 778"]
+        LTV["LTV (Long Term Validation)<br/>Validade Jurídica Independente de Revogação"]
+    end
+
+    subgraph Camada_4["4. Camada Regulatória & Amparo Jurídico"]
+        Lei14063["Lei Federal nº 14.063/2020<br/>Art. 5º, § 1º (Assinatura Eletrônica Avançada)"]
+        MP2200["Medida Provisória nº 2.200-2/2001<br/>Infraestrutura de Chaves Públicas ICP-Brasil"]
+        CodigoCivil["Código Civil Brasileiro (Lei 10.406/2002)<br/>Art. 107 e 219 (Validade Probatória)"]
+    end
+
+    Touch --> SHA256
+    OTP --> SHA256
+    Biometria --> SHA256
+    SHA256 --> Timestamp
+    Timestamp --> PAdES
+    PAdES --> LTV
+    LTV --> Lei14063
+    LTV --> MP2200
+    LTV --> CodigoCivil

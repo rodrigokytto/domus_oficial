@@ -1,0 +1,20 @@
+sequenceDiagram
+    autonumber
+    actor Perito as Perito Vistoriador / Corretor
+    participant Celular as Smartphone (iOS Safari / Android)
+    participant Canvas as Canvas Gráfico 60 FPS
+    participant Servidor as Backend Fastify (Gama GCP)
+    participant Storage as Cloud Storage & Verificador
+
+    Perito->>Celular: Acessa /plataforma/vistorias e clica "Abrir Câmera ao Vivo"
+    Celular->>Celular: navigator.mediaDevices.getUserMedia(video: facingMode)
+    Celular-->>Perito: Stream de Vídeo em Tempo Real (1080p Full HD)
+    Perito->>Celular: Enquadra cômodo e toca em "Capturar Foto Forense"
+    Celular->>Canvas: Renderiza frame de vídeo no buffer gráfico
+    Celular->>Canvas: Injeta Carimbo Forense:<br/>• Data e Hora UTC-4 (Tangará da Serra - MT)<br/>• Coordenadas GPS (-14.6231, -57.4892)<br/>• Selo Gama Patrimonial (CRECI-MT J-14280)
+    Canvas->>Celular: Converte para JPEG 95% e calcula Hash SHA-256 do arquivo
+    Celular->>Servidor: Upload da imagem com metadados periciais forenses
+    Servidor->>Storage: Armazenamento indelével com hash imutável
+    Perito->>Celular: Coleta Assinatura Touch em Tela de Locatário e Locador
+    Celular->>Servidor: Registro das assinaturas touch e selagem do Laudo A4
+    Servidor-->>Perito: Laudo Pericial Homologado e Certidão Criptográfica

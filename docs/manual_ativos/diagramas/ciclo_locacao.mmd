@@ -1,0 +1,31 @@
+sequenceDiagram
+    autonumber
+    actor Locatario as Locatário (Dr. Rodrigo Gonçalves)
+    actor Locador as Locador (Guilherme Gama)
+    participant Plataforma as Plataforma Gama Patrimonial
+    participant IA as Motor de Análise & IA
+    participant Diretoria as Diretoria Executiva
+    participant ERP as Backoffice ERP Kytto (Razão)
+
+    Note over Locatario, Plataforma: 1. Captação & Cadastro
+    Locatario->>Plataforma: Envio de dados, CPF e proposta de locação
+    Plataforma->>IA: Disparo de Análise de Risco & Score
+    IA-->>Plataforma: Parecer IA: Score 98/100 (Baixo Risco) · Caução 3x R$ 11.400,00
+
+    Note over Plataforma, Diretoria: 2. Geração da Minuta & Aprovação Formal
+    Plataforma->>Plataforma: Geração da Minuta Lei 8.245/1991 (Hash SHA-256)
+    Plataforma->>Diretoria: Submissão para Aprovação Executiva
+    Diretoria->>Plataforma: Aprovação Formal Registrada (Audit Log)
+
+    Note over Plataforma, Locador: 3. Disparo & Assinaturas Digitais
+    Plataforma->>Locatario: Notificação WhatsApp + E-mail (Token Único de Assinatura)
+    Plataforma->>Locador: Notificação WhatsApp + E-mail (Token Único de Assinatura)
+    Locatario->>Plataforma: Assinatura Touch em Tela / Celular (Lei 14.063/2020)
+    Locador->>Plataforma: Assinatura Eletrônica Avançada / Touch
+    Plataforma->>Plataforma: Carimbo de Tempo RFC 3161 & Selagem PAdES
+
+    Note over Plataforma, ERP: 4. Ativação Contratual & Razão Universal
+    Plataforma->>ERP: Lançamento de Caução R$ 11.400,00 (Passivo de Custódia)
+    Plataforma->>ERP: Geração de Contas a Receber (Mensalidades R$ 3.800,00)
+    Plataforma->>ERP: Split Automático: Repasse Locador + Taxa de Administração 10%
+    Plataforma-->>Locatario: Contrato Final Assinado Disponível para Download
