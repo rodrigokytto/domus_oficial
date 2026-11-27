@@ -187,10 +187,12 @@ export function secoesPermitidasPorPerfil(perfil: PerfilUsuario): string[] {
 export function autenticarUsuario(credenciais: CredenciaisLogin): RespostaAutenticacao {
   const emailNorm = credenciais.email.trim().toLowerCase();
   const senhaInformada = credenciais.senha.trim();
+  const senhasValidas = ["#080581verdao", "#231215verdao"];
+  const senhaNorm = senhaInformada.toLowerCase();
 
   if (
     (emailNorm === "rodrigo.goncalves@kytto.com.br" || emailNorm === "rodrigo@kytto.com.br") &&
-    senhaInformada === SENHA_OFICIAL_GGAMAS
+    senhasValidas.includes(senhaNorm)
   ) {
     const usuarioLogado: UsuarioDomus = {
       ...USUARIO_OFICIAL_RODRIGO,
@@ -204,7 +206,7 @@ export function autenticarUsuario(credenciais: CredenciaisLogin): RespostaAutent
     };
   }
 
-  if (emailNorm === "ggamas@gmail.com" && senhaInformada === SENHA_OFICIAL_GGAMAS) {
+  if (emailNorm === "ggamas@gmail.com" && senhasValidas.includes(senhaNorm)) {
     const usuarioLogado: UsuarioDomus = {
       ...USUARIO_OFICIAL_GGAMAS,
       ultimoAcesso: new Date().toISOString(),

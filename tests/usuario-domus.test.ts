@@ -47,6 +47,17 @@ describe("Gestão de Usuário Multiperfil Domus - ggamas@gmail.com", () => {
     expect(res.usuario?.creci).toBe("CRECI J-14280 MT");
   });
 
+  it("deve autenticar com sucesso rodrigo.goncalves@kytto.com.br com a senha #080581Verdao", () => {
+    const res = autenticarUsuario({
+      email: "rodrigo.goncalves@kytto.com.br",
+      senha: "#080581Verdao",
+    });
+
+    expect(res.sucesso).toBe(true);
+    expect(res.usuario).toBeDefined();
+    expect(res.usuario?.email).toBe("rodrigo.goncalves@kytto.com.br");
+  });
+
   it("deve rejeitar autenticação com senha incorreta", () => {
     const res = autenticarUsuario({
       email: "ggamas@gmail.com",
