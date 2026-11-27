@@ -261,7 +261,7 @@ export const GestaoImoveisGama: React.FC<Props> = ({
                     <button
                       type="button"
                       onClick={() => aoAbrirPaperPdf(im)}
-                      title="Gerar Paper PDF A4"
+                      title="Gerar PDF - Paper Executivo A4 para WhatsApp"
                       style={{
                         background: "#121212",
                         color: "#C6A15B",
@@ -277,7 +277,7 @@ export const GestaoImoveisGama: React.FC<Props> = ({
                       }}
                     >
                       <FileText size={13} />
-                      Paper PDF A4
+                      Gerar PDF
                     </button>
                   </div>
                 </td>
