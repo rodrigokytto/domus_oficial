@@ -2,6 +2,7 @@
   "name": "domus-consorcios",
   "version": "1.0.0",
   "description": "Domus Consórcios & Soluções Financeiras - Plataforma de Venda e Gestão de Consórcios",
+  "packageManager": "pnpm@9.15.4",
   "private": true,
   "type": "module",
   "scripts": {
