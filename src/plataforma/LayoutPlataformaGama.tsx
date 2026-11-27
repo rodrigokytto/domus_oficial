@@ -15,8 +15,20 @@ import {
   Coins,
   FileCode2,
   ShieldAlert,
+  UserCheck,
 } from "lucide-react";
 import { MARCA_GAMA } from "../lib/marcaGama";
+import type { PerfilUsuario, UsuarioDomus } from "../types/usuario";
+import {
+  obterSessao,
+  USUARIO_OFICIAL_GGAMAS,
+  rotuloPerfil,
+  badgeCorPerfil,
+  secoesPermitidasPorPerfil,
+} from "../lib/authDomus";
+import { SeletorPerfilDomus } from "../components/SeletorPerfilDomus";
+import { ModalDetalhesUsuarioDomus } from "../components/ModalDetalhesUsuarioDomus";
+import { ModalLoginDomus } from "../components/ModalLoginDomus";
 
 export type SecaoPlataforma =
   | "hoje"
@@ -35,6 +47,9 @@ interface Props {
   secaoAtiva: SecaoPlataforma;
   aoMudarSecao: (secao: SecaoPlataforma) => void;
   aoVoltarSite: () => void;
+  usuario?: UsuarioDomus;
+  aoMudarPerfil?: (perfil: PerfilUsuario) => void;
+  aoDeslogar?: () => void;
   children: React.ReactNode;
 }
 
@@ -42,8 +57,19 @@ export const LayoutPlataformaGama: React.FC<Props> = ({
   secaoAtiva,
   aoMudarSecao,
   aoVoltarSite,
+  usuario,
+  aoMudarPerfil,
+  aoDeslogar,
   children,
 }) => {
+  const [modalDetalhesAberto, setModalDetalhesAberto] = useState(false);
+  const [modalLoginAberto, setModalLoginAberto] = useState(false);
+
+  // Usuário ativo (se não fornecido via prop, busca do storage ou usa o oficial ggamas@gmail.com)
+  const usuarioAtual = usuario ?? obterSessao() ?? USUARIO_OFICIAL_GGAMAS;
+  const perfilAtivo = usuarioAtual.perfilAtivo;
+  const badgePerfil = badgeCorPerfil(perfilAtivo);
+
   const itensMenu: { id: SecaoPlataforma; label: string; icon: any; badge?: string }[] = [
     { id: "hoje", label: "Hoje & Visão Geral", icon: LayoutDashboard },
     { id: "imoveis", label: "Carteira de Imóveis", icon: Building2, badge: "6 ativos" },
@@ -57,6 +83,21 @@ export const LayoutPlataformaGama: React.FC<Props> = ({
     { id: "compliance", label: "Auditoria & COAF", icon: ShieldAlert },
     { id: "agenda", label: "Agenda & Compromissos", icon: Calendar },
   ];
+
+  // Filtra as opções da barra lateral com base no perfil ativo da conta
+  const secoesPermitidas = secoesPermitidasPorPerfil(perfilAtivo);
+  const itensMenuFiltrados = itensMenu.filter((item) => secoesPermitidas.includes(item.id));
+
+  const lidarMudancaPerfil = (novoPerfil: PerfilUsuario) => {
+    if (aoMudarPerfil) {
+      aoMudarPerfil(novoPerfil);
+    }
+    // Ajusta a rota caso a tela atual não pertença ao novo perfil
+    const permitidasNovo = secoesPermitidasPorPerfil(novoPerfil);
+    if (!permitidasNovo.includes(secaoAtiva)) {
+      aoMudarSecao((permitidasNovo[0] as SecaoPlataforma) || "hoje");
+    }
+  };
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
@@ -76,17 +117,17 @@ export const LayoutPlataformaGama: React.FC<Props> = ({
         }}
       >
         {/* Header da Sidebar com Logo Branco da Gama */}
-        <div style={{ padding: "24px 20px", borderBottom: "1px solid rgba(198, 161, 91, 0.25)" }}>
+        <div style={{ padding: "20px 20px", borderBottom: "1px solid rgba(198, 161, 91, 0.25)" }}>
           <img
             src={MARCA_GAMA.logos.claro}
             alt={MARCA_GAMA.nome}
-            style={{ height: "42px", objectFit: "contain", marginBottom: "10px" }}
+            style={{ height: "40px", objectFit: "contain", marginBottom: "8px" }}
           />
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "6px",
+              justifyContent: "space-between",
               background: "rgba(198, 161, 91, 0.15)",
               color: "#C6A15B",
               padding: "4px 8px",
@@ -95,8 +136,23 @@ export const LayoutPlataformaGama: React.FC<Props> = ({
               fontWeight: "700",
             }}
           >
-            <ShieldCheck size={14} />
-            <span>PLATAFORMA CRECI {MARCA_GAMA.creci}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <ShieldCheck size={14} />
+              <span>CRECI {MARCA_GAMA.creci}</span>
+            </div>
+            <span
+              style={{
+                fontSize: "10px",
+                background: badgePerfil.bg,
+                color: badgePerfil.texto,
+                border: `1px solid ${badgePerfil.borda}`,
+                padding: "1px 6px",
+                borderRadius: "10px",
+                textTransform: "uppercase",
+              }}
+            >
+              {perfilAtivo}
+            </span>
           </div>
         </div>
 
@@ -104,18 +160,26 @@ export const LayoutPlataformaGama: React.FC<Props> = ({
         <nav style={{ padding: "16px 12px", display: "flex", flexDirection: "column", gap: "4px", flex: 1, overflowY: "auto" }}>
           <div
             style={{
-              fontSize: "10px",
-              textTransform: "uppercase",
-              letterSpacing: "1.5px",
-              color: "#94a3b8",
-              padding: "6px 12px",
-              fontWeight: "700",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "4px 12px",
             }}
           >
-            Gestão & Backoffice
+            <span
+              style={{
+                fontSize: "10px",
+                textTransform: "uppercase",
+                letterSpacing: "1.5px",
+                color: "#94a3b8",
+                fontWeight: "700",
+              }}
+            >
+              Menu · {rotuloPerfil(perfilAtivo)}
+            </span>
           </div>
 
-          {itensMenu.map((item) => {
+          {itensMenuFiltrados.map((item) => {
             const Icon = item.icon;
             const ativo = secaoAtiva === item.id;
             return (
@@ -162,28 +226,49 @@ export const LayoutPlataformaGama: React.FC<Props> = ({
           })}
         </nav>
 
-        {/* Rodapé da Sidebar */}
+        {/* Rodapé da Sidebar com Botão de Ficha Cadastral e Portal Público */}
         <div
           style={{
-            padding: "16px 20px",
+            padding: "14px 16px",
             borderTop: "1px solid rgba(255, 255, 255, 0.1)",
             display: "flex",
             flexDirection: "column",
-            gap: "10px",
+            gap: "8px",
           }}
         >
+          <button
+            onClick={() => setModalDetalhesAberto(true)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "8px 10px",
+              borderRadius: "6px",
+              background: "rgba(198, 161, 91, 0.1)",
+              color: "#C6A15B",
+              border: "1px solid rgba(198, 161, 91, 0.3)",
+              fontSize: "11px",
+              fontWeight: "700",
+              cursor: "pointer",
+              width: "100%",
+            }}
+          >
+            <UserCheck size={14} color="#C6A15B" />
+            <span>Ver Ficha: {usuarioAtual.email}</span>
+          </button>
+
           <button
             onClick={aoVoltarSite}
             style={{
               display: "flex",
               alignItems: "center",
               gap: "8px",
-              padding: "10px 12px",
-              borderRadius: "8px",
+              padding: "8px 10px",
+              borderRadius: "6px",
               background: "rgba(255, 255, 255, 0.05)",
               color: "#ffffff",
               border: "1px solid rgba(255, 255, 255, 0.1)",
-              fontSize: "12px",
+              fontSize: "11px",
               fontWeight: "600",
               cursor: "pointer",
               width: "100%",
@@ -193,7 +278,7 @@ export const LayoutPlataformaGama: React.FC<Props> = ({
             <span>Voltar ao Portal Público</span>
           </button>
 
-          <div style={{ fontSize: "11px", color: "#64748b", textAlign: "center" }}>
+          <div style={{ fontSize: "10px", color: "#64748b", textAlign: "center" }}>
             {MARCA_GAMA.cidade} · Tangará da Serra - MT
           </div>
         </div>
@@ -201,7 +286,7 @@ export const LayoutPlataformaGama: React.FC<Props> = ({
 
       {/* Conteúdo Principal */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
-        {/* Top bar da Plataforma */}
+        {/* Top bar da Plataforma com Seletor Multiperfil Interativo */}
         <header
           style={{
             height: "64px",
@@ -224,38 +309,42 @@ export const LayoutPlataformaGama: React.FC<Props> = ({
             </span>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            <div style={{ textAlign: "right" }}>
-              <div style={{ fontSize: "13px", fontWeight: "700", color: "#121212" }}>
-                Diretoria Executiva
-              </div>
-              <div style={{ fontSize: "11px", color: "#C6A15B", fontWeight: "600" }}>
-                CRECI J-14280 MT
-              </div>
-            </div>
-            <div
-              style={{
-                width: "36px",
-                height: "36px",
-                borderRadius: "50%",
-                background: "#121212",
-                color: "#C6A15B",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontWeight: "800",
-                fontSize: "14px",
-                border: "1px solid #C6A15B",
-              }}
-            >
-              GP
-            </div>
+          {/* Componente do Usuário e Seletor dos 4 Perfis */}
+          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+            <SeletorPerfilDomus
+              usuario={usuarioAtual}
+              aoMudarPerfil={lidarMudancaPerfil}
+              aoAbrirDetalhesUsuario={() => setModalDetalhesAberto(true)}
+              aoSair={() => setModalLoginAberto(true)}
+            />
           </div>
         </header>
 
         {/* Corpo da Página */}
         <main style={{ padding: "28px", flex: 1 }}>{children}</main>
       </div>
+
+      {/* Modal de Detalhes da Conta do Usuário e Permissões */}
+      {modalDetalhesAberto && (
+        <ModalDetalhesUsuarioDomus
+          usuario={usuarioAtual}
+          aoFechar={() => setModalDetalhesAberto(false)}
+          aoMudarPerfil={lidarMudancaPerfil}
+        />
+      )}
+
+      {/* Modal de Login / Troca de Credenciais */}
+      {modalLoginAberto && (
+        <ModalLoginDomus
+          aoSucesso={(novoUsuario) => {
+            setModalLoginAberto(false);
+            if (aoMudarPerfil) {
+              aoMudarPerfil(novoUsuario.perfilAtivo);
+            }
+          }}
+          aoFechar={() => setModalLoginAberto(false)}
+        />
+      )}
     </div>
   );
 };

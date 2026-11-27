@@ -22,6 +22,8 @@ import { MARCA_GAMA } from "./lib/marcaGama";
 import { IMOVEIS_MOCK } from "./data/imoveisMock";
 import type { Imovel } from "./types/imovel";
 import { simularConsorcio, TABELAS_ADMINISTRADORAS } from "./lib/motor-consorcios";
+import type { PerfilUsuario, UsuarioDomus } from "./types/usuario";
+import { obterSessao, USUARIO_OFICIAL_GGAMAS, alternarPerfilAtivo } from "./lib/authDomus";
 
 // Componentes do Site Público
 import { NavbarGama } from "./components/NavbarGama";
@@ -88,6 +90,18 @@ export const App: React.FC = () => {
   const [modalIaAberto, setModalIaAberto] = useState(false);
   const [modalComparadorAberto, setModalComparadorAberto] = useState(false);
   const [modalAvaliacaoAberto, setModalAvaliacaoAberto] = useState(false);
+
+  // Usuário Multiperfil Domus (ggamas@gmail.com com corretor, cliente, vendedor e gerente)
+  const [usuario, setUsuario] = useState<UsuarioDomus>(() => obterSessao() ?? USUARIO_OFICIAL_GGAMAS);
+
+  const handleMudarPerfil = (novoPerfil: PerfilUsuario) => {
+    try {
+      const u = alternarPerfilAtivo(novoPerfil);
+      setUsuario(u);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   // Imóveis selecionados para comparação
   const [comparadorIds, setComparadorIds] = useState<string[]>([]);
@@ -167,6 +181,8 @@ export const App: React.FC = () => {
       {rotaAtual === "plataforma" ? (
         <LayoutPlataformaGama
           secaoAtiva={secaoPlataforma}
+          usuario={usuario}
+          aoMudarPerfil={handleMudarPerfil}
           aoMudarSecao={(secao) => {
             setSecaoPlataforma(secao);
             if (typeof window !== "undefined") {
