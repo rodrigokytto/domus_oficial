@@ -49,7 +49,7 @@ export const LayoutPlataformaGama: React.FC<Props> = ({
     { id: "imoveis", label: "Carteira de Imóveis", icon: Building2, badge: "6 ativos" },
     { id: "crm", label: "CRM & Funil de Vendas", icon: Users, badge: "8 leads" },
     { id: "vistorias", label: "Vistorias & Laudos Digitais", icon: ClipboardCheck },
-    { id: "contratos", label: "Central de Minutas & Contratos", icon: FileText },
+    { id: "contratos", label: "Contratos & Minutas IA", icon: FileText, badge: "ICP-Brasil" },
     { id: "financeiro", label: "ERP Financeiro & DRE", icon: DollarSign, badge: "Kytto" },
     { id: "repasses", label: "Repasses & Comissões", icon: Coins },
     { id: "fiscal", label: "NFS-e & DIMOB (Receita)", icon: FileCode2 },

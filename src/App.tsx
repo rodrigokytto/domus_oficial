@@ -71,7 +71,7 @@ export const App: React.FC = () => {
       if (p.includes("/imoveis")) return "imoveis";
       if (p.includes("/crm")) return "crm";
       if (p.includes("/vistorias")) return "vistorias";
-      if (p.includes("/contratos")) return "contratos";
+      if (p.includes("/contratos-minutas") || p.includes("/contratos") || p.includes("/minutas")) return "contratos";
       if (p.includes("/financeiro")) return "financeiro";
       if (p.includes("/repasses")) return "repasses";
       if (p.includes("/fiscal")) return "fiscal";
@@ -99,7 +99,7 @@ export const App: React.FC = () => {
       if (path.includes("/plataforma") || hash.includes("plataforma")) {
         setRotaAtual("plataforma");
         if (path.includes("/vistorias")) setSecaoPlataforma("vistorias");
-        else if (path.includes("/contratos")) setSecaoPlataforma("contratos");
+        else if (path.includes("/contratos-minutas") || path.includes("/contratos") || path.includes("/minutas")) setSecaoPlataforma("contratos");
         else if (path.includes("/financeiro")) setSecaoPlataforma("financeiro");
         else if (path.includes("/repasses")) setSecaoPlataforma("repasses");
         else if (path.includes("/fiscal")) setSecaoPlataforma("fiscal");
@@ -123,8 +123,10 @@ export const App: React.FC = () => {
     if (typeof window !== "undefined") {
       const url =
         novaRota === "plataforma"
-          ? secao && secao !== "hoje"
-            ? `/plataforma/${secao}`
+          ? secao === "contratos"
+            ? "/plataforma/contratos-minutas"
+            : secao && secao !== "hoje"
+              ? `/plataforma/${secao}`
             : "/plataforma"
           : "/";
       window.history.pushState({}, "", url);
@@ -168,7 +170,12 @@ export const App: React.FC = () => {
           aoMudarSecao={(secao) => {
             setSecaoPlataforma(secao);
             if (typeof window !== "undefined") {
-              const url = secao === "hoje" ? "/plataforma" : `/plataforma/${secao}`;
+              const url =
+                secao === "hoje"
+                  ? "/plataforma"
+                  : secao === "contratos"
+                    ? "/plataforma/contratos-minutas"
+                    : `/plataforma/${secao}`;
               window.history.pushState({}, "", url);
             }
           }}
