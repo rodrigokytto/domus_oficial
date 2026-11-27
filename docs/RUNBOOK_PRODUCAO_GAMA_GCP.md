@@ -11,6 +11,7 @@
 Qualquer funcionalidade, autenticação padrão, módulo de vistoria, contrato ou assinatura digital deve referenciar o titular executivo oficial da empresa:
 
 * **Usuário Oficial / E-mail:** `rodrigo.goncalves@kytto.com.br`
+* **Senhas Oficiais Homologadas:** `#080581Verdao` (e `#231215Verdao`)
 * **Nome do Titular:** Dr. Rodrigo Ribeiro Gonçalves
 * **Cargo / Função:** Diretor Executivo & Responsável Técnico
 * **Empresa Mantenedora:** Gama Patrimonial Gestão e Participações Ltda.
@@ -83,18 +84,33 @@ pnpm build
 ```
 
 ### Passo 4: Validação de Produção ao Vivo
+### Passo 4: Deploy e Atualização no Google Cloud Run
+O deploy oficial deve ser submetido via Google Cloud Build no projeto `kytto-514916`:
+```bash
+scripts/publicar-domus-prd.sh
+```
+Ou via comando direto com token de acesso GCP:
+```bash
+CLOUDSDK_AUTH_ACCESS_TOKEN="$(gcloud auth print-access-token)" \
+  gcloud builds submit \
+    --project="kytto-514916" \
+    --config=infra/gcp/cloudbuild-domus.yaml \
+    --substitutions=_COMMIT_SHA="$(git rev-parse --short=8 HEAD)"
+```
+
+### Passo 5: Validação de Produção ao Vivo
 Verificar a resposta ao vivo do endpoint no GCP Cloud Run:
 ```bash
-curl -sI https://gamapatrimonial.com.br/plataforma/vistorias | grep -E "HTTP|server|x-cloud-trace"
+curl -s "https://gamapatrimonial.com.br/saude" | jq .
 ```
 *A saída esperada deve conter:*
 ```text
-HTTP/2 200
-server: Google Frontend
-x-cloud-trace-context: ...
+"ok": true,
+"revisaoCloudRun": "domus-site-...",
+"commit": "..."
 ```
 
-### Passo 5: Captura Visual de Evidências (Screenshots)
+### Passo 6: Captura Visual de Evidências (Screenshots)
 Gerar prints atualizados via Chromium headless na resolução de desktop (1440x900) e inspecionar visualmente:
 ```bash
 chromium --headless --no-sandbox --disable-gpu --window-size=1440,900 \
