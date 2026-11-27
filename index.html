@@ -50,18 +50,42 @@
         font-family: inherit;
       }
       @media print {
-        body {
+        @page {
+          size: A4 portrait;
+          margin: 0;
+        }
+        html, body {
           background: #ffffff !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          width: 100% !important;
         }
         header, footer, nav, button, .no-print {
           display: none !important;
         }
+        .modal-paper-overlay {
+          position: absolute !important;
+          top: 0 !important;
+          left: 0 !important;
+          width: 100% !important;
+          min-height: 100vh !important;
+          background: #ffffff !important;
+          padding: 0 !important;
+          margin: 0 !important;
+          overflow: visible !important;
+          backdrop-filter: none !important;
+          z-index: 999999 !important;
+        }
         #folha-paper-pdf-a4 {
           box-shadow: none !important;
-          margin: 0 !important;
-          padding: 0 !important;
-          width: 100% !important;
-          max-width: 100% !important;
+          border: none !important;
+          margin: 0 auto !important;
+          padding: 12mm 14mm !important;
+          width: 210mm !important;
+          max-width: 210mm !important;
+          box-sizing: border-box !important;
+          page-break-after: avoid !important;
+          break-after: avoid !important;
         }
       }
     </style>

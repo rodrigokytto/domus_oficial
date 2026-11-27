@@ -114,6 +114,7 @@ export const ModalPaperPdfImovel: React.FC<Props> = ({ imovel, aoFechar }) => {
 
   return (
     <div
+      className="modal-paper-overlay"
       style={{
         position: "fixed",
         inset: 0,
@@ -128,6 +129,7 @@ export const ModalPaperPdfImovel: React.FC<Props> = ({ imovel, aoFechar }) => {
     >
       {/* Barra de Ações Superior */}
       <div
+        className="no-print"
         style={{
           maxWidth: "850px",
           width: "100%",
