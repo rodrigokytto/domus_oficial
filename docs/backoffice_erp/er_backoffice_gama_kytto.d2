@@ -1,0 +1,380 @@
+direction: down
+
+title: Gama Patrimonial × Kytto ERP - Modelo Entidade-Relacionamento Backoffice Enterprise {
+  near: top-center
+  shape: text
+  style.font-size: 28
+  style.bold: true
+  style.font-color: "#121212"
+}
+
+# Paleta oficial Gama Patrimonial: Preto #121212, Dourado #C6A15B, Fundo Nobre #F7F3EA, Grafite #2B2B2B
+
+governanca: 1. Governança, Multiempresa & RBAC {
+  style.fill: "#121212"
+  style.font-color: "#C6A15B"
+  style.stroke: "#C6A15B"
+
+  empresa: EMPRESAS\n(Gama Patrimonial Gestão e Participações Ltda)\n[CNPJ 52.894.120/0001-44 | CRECI J-14280 MT] {
+    shape: sql_table
+    style.fill: "#2B2B2B"
+    style.font-color: "#FFFFFF"
+    id: "UUID (PK)"
+    razao_social: "VARCHAR(255)"
+    creci_juridico: "VARCHAR(20) J-14280 MT"
+    cidade_ibge: "CHAR(7) 5107958 (Tangará da Serra)"
+    regime_tributario: "VARCHAR(30) Lucro Presumido"
+  }
+
+  unidades: UNIDADES_NEGOCIO {
+    shape: sql_table
+    style.fill: "#2B2B2B"
+    style.font-color: "#FFFFFF"
+    id: "UUID (PK)"
+    empresa_id: "UUID (FK)"
+    codigo: "VARCHAR(30) MATRIZ, AGRO_MT, CONSORCIOS"
+    tipo: "VARCHAR(40)"
+  }
+
+  usuarios: USUARIOS & CORRETORES {
+    shape: sql_table
+    style.fill: "#2B2B2B"
+    style.font-color: "#FFFFFF"
+    id: "UUID (PK)"
+    empresa_id: "UUID (FK)"
+    nome_completo: "VARCHAR(255)"
+    creci_fisico: "VARCHAR(20)"
+    cargo_role: "VARCHAR(50) Diretor, Corretor, Financeiro"
+    segundo_fator: "BOOLEAN (2FA / TOTP)"
+  }
+
+  perfis: PERFIS_PERMISSOES (RBAC) {
+    shape: sql_table
+    style.fill: "#2B2B2B"
+    style.font-color: "#FFFFFF"
+    id: "UUID (PK)"
+    usuario_id: "UUID (FK)"
+    modulo: "VARCHAR(50)"
+    pode_aprovar_pagamento: "BOOLEAN"
+    pode_emitir_fiscal: "BOOLEAN"
+  }
+
+  contrapartes: CONTRAPARTES (Clientes, Proprietários & Fornecedores) {
+    shape: sql_table
+    style.fill: "#2B2B2B"
+    style.font-color: "#FFFFFF"
+    id: "UUID (PK)"
+    empresa_id: "UUID (FK)"
+    documento: "VARCHAR(18) CPF / CNPJ"
+    papel: "VARCHAR(40) Locador, Locatário, Comprador, Fornecedor"
+    dados_bancarios_repasse: "JSONB (PIX, Banco, Agência, Conta)"
+    score_credito: "INTEGER (0 a 1000)"
+  }
+
+  empresa -> unidades: 1:N Unidades
+  empresa -> usuarios: 1:N Colaboradores
+  usuarios -> perfis: 1:N Permissões
+  empresa -> contrapartes: 1:N Cadastros Mestres
+}
+
+financeiro: 2. ERP Financeiro & Tesouraria (Razão Universal Kytto) {
+  style.fill: "#F7F3EA"
+  style.stroke: "#C6A15B"
+  style.stroke-width: 2
+
+  plano_contas: FIN_PLANO_CONTAS {
+    shape: sql_table
+    style.fill: "#FFFFFF"
+    id: "UUID (PK)"
+    codigo_estruturado: "VARCHAR(40) (1.1.01, 3.1.02...)"
+    tipo: "VARCHAR(10) Ativo, Passivo, Receita, Despesa"
+    grupo_dre: "VARCHAR(30) Receita Bruta, Deduções, Custos"
+  }
+
+  centros_custo: FIN_CENTROS_CUSTO {
+    shape: sql_table
+    style.fill: "#FFFFFF"
+    id: "UUID (PK)"
+    codigo: "VARCHAR(30) LOCACAO, VENDAS, AGRO, CONSORCIOS"
+    nome: "VARCHAR(120)"
+  }
+
+  contas_bancarias: FIN_CONTAS_BANCARIAS {
+    shape: sql_table
+    style.fill: "#FFFFFF"
+    id: "UUID (PK)"
+    codigo_banco: "VARCHAR(10) BB, Bradesco, Itaú, Sicredi, Sicoob"
+    saldo_atual: "NUMERIC(14,2)"
+  }
+
+  lancamentos: FIN_LANCAMENTOS (Razão Universal com Idempotência) {
+    shape: sql_table
+    style.fill: "#C6A15B"
+    style.font-color: "#121212"
+    id: "UUID (PK)"
+    plano_contas_id: "UUID (FK)"
+    centro_custo_id: "UUID (FK)"
+    conta_bancaria_id: "UUID (FK)"
+    contraparte_id: "UUID (FK)"
+    tipo_natureza: "receita / despesa (pagar / receber / avulso)"
+    valor_efetivo: "NUMERIC(14,2) (Nominal + Juros + Multa - Desc)"
+    data_competencia: "DATE (Regime de Competência DRE)"
+    data_vencimento: "DATE (Fluxo de Caixa)"
+    data_liquidacao: "TIMESTAMPTZ"
+    status: "VARCHAR(20) pendente, liquidado, estornado"
+    chave_idempotencia: "VARCHAR(200) (Bloqueia Duplicidade)"
+    origem_modulo: "VARCHAR(40) imob_aluguel, imob_repasse, consorcios"
+  }
+
+  conciliacoes: FIN_CONCILIACOES_EXTRATO {
+    shape: sql_table
+    style.fill: "#FFFFFF"
+    id: "UUID (PK)"
+    conta_bancaria_id: "UUID (FK)"
+    lancamento_id: "UUID (FK)"
+    fitid_ofx: "VARCHAR(100)"
+    valor: "NUMERIC(14,2)"
+    status: "conciliado / divergente"
+  }
+
+  fechamentos: FIN_FECHAMENTOS_PERIODO (DRE Mensal) {
+    shape: sql_table
+    style.fill: "#FFFFFF"
+    id: "UUID (PK)"
+    ano_mes: "CHAR(7) '2026-11'"
+    total_receita_bruta: "NUMERIC(14,2)"
+    total_repasses_proprietarios: "NUMERIC(14,2)"
+    total_comissoes_corretores: "NUMERIC(14,2)"
+    resultado_liquido_dre: "NUMERIC(14,2)"
+  }
+
+  plano_contas -> lancamentos: Classifica
+  centros_custo -> lancamentos: Rateia
+  contas_bancarias -> lancamentos: Movimenta
+  contas_bancarias -> conciliacoes: Importa Extrato OFX
+  lancamentos -> fechamentos: Consolida DRE
+}
+
+carteira_imob: 3. Backoffice Imobiliário & Gestão de Contratos {
+  style.fill: "#FFFFFF"
+  style.stroke: "#2B2B2B"
+
+  imoveis: IMOB_IMOVEIS_PATRIMONIO {
+    shape: sql_table
+    style.fill: "#F7F3EA"
+    id: "UUID (PK)"
+    codigo_referencia: "VARCHAR(30) GAMA-RES, GAMA-FAZ"
+    proprietario_id: "UUID (FK)"
+    finalidade: "venda, locacao, agro"
+    valor_pretendido: "NUMERIC(14,2)"
+    status: "disponivel, locado, vendido"
+  }
+
+  contratos: IMOB_CONTRATOS {
+    shape: sql_table
+    style.fill: "#C6A15B"
+    style.font-color: "#121212"
+    id: "UUID (PK)"
+    imovel_id: "UUID (FK)"
+    locador_vendedor_id: "UUID (FK)"
+    locatario_comprador_id: "UUID (FK)"
+    corretor_id: "UUID (FK)"
+    tipo_contrato: "locacao, compra_venda, arrendamento_agro"
+    valor_contrato: "NUMERIC(14,2)"
+    taxa_administracao_perc: "NUMERIC(5,2) (8% a 10%)"
+    tipo_garantia: "caucao, seguro_fianca, fiador"
+  }
+
+  repasses: IMOB_REPASSES_LOCACAO {
+    shape: sql_table
+    style.fill: "#F7F3EA"
+    id: "UUID (PK)"
+    contrato_id: "UUID (FK)"
+    mes_competencia: "CHAR(7)"
+    valor_aluguel_bruto: "NUMERIC(14,2)"
+    taxa_administracao_retida: "NUMERIC(14,2) (Receita Gama)"
+    retencao_irrf_dimob: "NUMERIC(14,2)"
+    valor_liquido_repasse: "NUMERIC(14,2) (Líquido Proprietário)"
+    status: "pendente, recebido, repassado"
+  }
+
+  comissoes: IMOB_COMISSOES_CORRETAGEM {
+    shape: sql_table
+    style.fill: "#F7F3EA"
+    id: "UUID (PK)"
+    contrato_id: "UUID (FK)"
+    corretor_id: "UUID (FK)"
+    valor_honorarios_gama: "NUMERIC(14,2)"
+    valor_liquido_corretor: "NUMERIC(14,2) (Split Corretor)"
+    status: "a_pagar, pago"
+  }
+
+  vistorias: IMOB_VISTORIAS_DIGITAIS {
+    shape: sql_table
+    style.fill: "#F7F3EA"
+    id: "UUID (PK)"
+    contrato_id: "UUID (FK)"
+    tipo: "entrada, saida, constatacao"
+    fotos_hash_sha256: "TEXT[]"
+    assinatura_eletronica_touch: "TEXT (Base64)"
+  }
+
+  imoveis -> contratos: Vincula Objeto
+  contratos -> repasses: 1:N Faturamento Mensal
+  contratos -> comissoes: 1:N Rateio de Honorários
+  contratos -> vistorias: 1:N Laudos de Vistoria
+}
+
+consorcios: 4. Backoffice de Consórcios (Domus Consórcios × Gama) {
+  style.fill: "#F7F3EA"
+  style.stroke: "#C6A15B"
+
+  administradoras: CONSORCIO_ADMINISTRADORAS {
+    shape: sql_table
+    style.fill: "#FFFFFF"
+    id: "UUID (PK)"
+    nome: "Porto Seguro, Rodobens, Itaú, Embracon"
+    registro_bacen: "VARCHAR(30)"
+    perc_comissao_faturamento: "NUMERIC(5,2)"
+  }
+
+  cotas: CONSORCIO_COTAS {
+    shape: sql_table
+    style.fill: "#FFFFFF"
+    id: "UUID (PK)"
+    administradora_id: "UUID (FK)"
+    cliente_id: "UUID (FK)"
+    segmento: "imovel, agro, pesados"
+    grupo_cota: "VARCHAR(40)"
+    credito_nominal: "NUMERIC(14,2)"
+    status: "ativa, contemplada, cancelada"
+  }
+
+  faturamento_consorcio: CONSORCIO_COMISSOES_FATURAMENTO {
+    shape: sql_table
+    style.fill: "#FFFFFF"
+    id: "UUID (PK)"
+    cota_id: "UUID (FK)"
+    valor_comissao_gama: "NUMERIC(14,2)"
+    valor_repasse_consultor: "NUMERIC(14,2)"
+    status: "faturado, recebido"
+  }
+
+  administradoras -> cotas: Regula Cotas
+  cotas -> faturamento_consorcio: Gera Comissões
+}
+
+fiscal: 5. Módulo Fiscal, NFS-e Tangará & DIMOB Nacional {
+  style.fill: "#121212"
+  style.font-color: "#C6A15B"
+  style.stroke: "#C6A15B"
+
+  certificados: FIS_CERTIFICADOS_A1 {
+    shape: sql_table
+    style.fill: "#2B2B2B"
+    style.font-color: "#FFFFFF"
+    id: "UUID (PK)"
+    pfx_cifrado: "TEXT (AES-256-GCM)"
+    valido_ate: "TIMESTAMPTZ"
+  }
+
+  emitentes: FIS_EMITENTES_SERVICO {
+    shape: sql_table
+    style.fill: "#2B2B2B"
+    style.font-color: "#FFFFFF"
+    id: "UUID (PK)"
+    cnae_principal: "6821-8/01 (Intermediação Imobiliária)"
+    aliquota_iss: "NUMERIC(5,2) 5.00% (Tangará da Serra)"
+    provedor: "Padrão Nacional / SEFIN"
+  }
+
+  nfse: FIS_NFSE_EMITIDAS {
+    shape: sql_table
+    style.fill: "#2B2B2B"
+    style.font-color: "#FFFFFF"
+    id: "UUID (PK)"
+    contrato_id: "UUID (FK)"
+    numero_nfse: "BIGINT"
+    valor_servicos: "NUMERIC(14,2)"
+    valor_iss: "NUMERIC(14,2)"
+    status: "autorizada, cancelada"
+  }
+
+  dimob: FIS_DIMOB_DECLARACOES (Receita Federal) {
+    shape: sql_table
+    style.fill: "#2B2B2B"
+    style.font-color: "#FFFFFF"
+    id: "UUID (PK)"
+    ano_calendario: "SMALLINT (2026)"
+    total_locacao_venda: "NUMERIC(16,2)"
+    recibo_transmissao: "VARCHAR(60)"
+  }
+
+  dimob_itens: FIS_DIMOB_REGISTROS_LOCACAO {
+    shape: sql_table
+    style.fill: "#2B2B2B"
+    style.font-color: "#FFFFFF"
+    id: "UUID (PK)"
+    declaracao_id: "UUID (FK)"
+    proprietario_cpf: "VARCHAR(14)"
+    inquilino_cpf: "VARCHAR(14)"
+    valor_aluguel_anual: "NUMERIC(14,2)"
+    valor_comissao_anual: "NUMERIC(14,2)"
+    valor_irrf_retido: "NUMERIC(14,2)"
+  }
+
+  reforma: FIS_REFORMA_TRIBUTARIA_IBS_CBS {
+    shape: sql_table
+    style.fill: "#2B2B2B"
+    style.font-color: "#FFFFFF"
+    id: "UUID (PK)"
+    cst_ibscbs: "CHAR(3)"
+    c_class_trib: "CHAR(6)"
+    regime: "Locação e Intermediação Imobiliária"
+  }
+
+  emitentes -> nfse: Emite Notas
+  dimob -> dimob_itens: 1:N Registros DIMOB
+}
+
+compliance: 6. Auditoria Imutável & Compliance COAF {
+  style.fill: "#2B2B2B"
+  style.font-color: "#FFFFFF"
+  style.stroke: "#C6A15B"
+
+  auditoria: AUDITORIA_TRILHA_IMUTAVEL {
+    shape: sql_table
+    style.fill: "#121212"
+    style.font-color: "#C6A15B"
+    id: "UUID (PK)"
+    tabela_afetada: "VARCHAR(80)"
+    acao: "INSERT, UPDATE, DELETE"
+    usuario_id: "UUID (FK)"
+    payload_diff: "JSONB"
+    hash_sha256: "CHAR(64)"
+    timestamp: "TIMESTAMPTZ"
+  }
+
+  coaf: COMPLIANCE_COAF_DILIGENCIA {
+    shape: sql_table
+    style.fill: "#121212"
+    style.font-color: "#C6A15B"
+    id: "UUID (PK)"
+    contrato_id: "UUID (FK)"
+    valor_operacao: "NUMERIC(14,2)"
+    alerta_especie: "BOOLEAN (> R$ 100 mil)"
+    status_siscoaf: "dispensado, comunicado"
+  }
+}
+
+# Integrações Diretas Transversais entre os Módulos de Backoffice:
+
+carteira_imob.repasses -> financeiro.lancamentos: Gera Contas a Pagar (Repasse Proprietário)
+carteira_imob.contratos -> financeiro.lancamentos: Gera Contas a Receber (Aluguel/Taxa Adm)
+carteira_imob.comissoes -> financeiro.lancamentos: Gera Contas a Pagar (Honorários Corretor)
+consorcios.faturamento_consorcio -> financeiro.lancamentos: Gera Contas a Receber (Comissão Faturada)
+
+carteira_imob.contratos -> fiscal.nfse: Gera Faturamento Municipal de Serviços
+carteira_imob.repasses -> fiscal.dimob_itens: Alimenta Registros Obrigatórios DIMOB
+carteira_imob.contratos -> compliance.coaf: Monitora Prevenção à Lavagem de Dinheiro
+financeiro.lancamentos -> compliance.auditoria: Grava Trilha Criptográfica

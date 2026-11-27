@@ -1,0 +1,100 @@
+flowchart TD
+    classDef gamaHeader fill:#121212,stroke:#C6A15B,stroke-width:2px,color:#C6A15B,font-weight:bold
+    classDef container fill:#F7F3EA,stroke:#C6A15B,stroke-width:2px,color:#121212
+    classDef tableMaster fill:#121212,stroke:#C6A15B,stroke-width:1.5px,color:#FFFFFF
+    classDef tableCore fill:#FFFFFF,stroke:#2B2B2B,stroke-width:1.5px,color:#121212
+    classDef tableAccent fill:#C6A15B,stroke:#121212,stroke-width:2px,color:#121212,font-weight:bold
+
+    subgraph HEADER ["🏛️ GAMA PATRIMONIAL GESTÃO E PARTICIPAÇÕES LTDA | CRECI J-14280 MT | CNPJ 52.894.120/0001-44"]
+        direction LR
+        GAMA_MATRIZ["<b>EMPRESAS (Matriz Tangará da Serra - MT)</b><br/>• Regime: Lucro Presumido<br/>• IBGE: 5107958"]:::gamaHeader
+        UNIDADES["<b>UNIDADES_NEGOCIO</b><br/>• Matriz Imobiliária<br/>• Divisão Agro MT (Fazendas)<br/>• Domus Consórcios"]:::tableMaster
+        USUARIOS["<b>USUARIOS & CORRETORES</b><br/>• Equipe Comercial & Diretoria<br/>• 2FA / TOTP Obrigatório<br/>• CRECI Individual"]:::tableMaster
+        PERFIS_RBAC["<b>PERFIS_PERMISSOES (RBAC)</b><br/>• Financeiro / Diretor<br/>• Aprovação Pagamento<br/>• Emissão Fiscal"]:::tableMaster
+        CONTRAPARTES["<b>CONTRAPARTES (Cadastros Mestres)</b><br/>• Locadores, Locatários, Compradores<br/>• Fornecedores & Consultores<br/>• Dados PIX / Repasse Bancário"]:::tableMaster
+    end
+
+    subgraph FINANCEIRO ["💰 ERP FINANCEIRO & TESOURARIA (RAZÃO UNIVERSAL KYTTO)"]
+        direction TB
+        FIN_PLANO["<b>FIN_PLANO_CONTAS</b><br/>• Código Estruturado (1.1, 3.1...)<br/>• Ativo, Passivo, Receita, Despesa<br/>• Vínculo Direto Grupo DRE"]:::tableCore
+        FIN_CENTROS["<b>FIN_CENTROS_CUSTO</b><br/>• Locação Carteira<br/>• Vendas Alto Padrão<br/>• Agro MT (Fazendas)<br/>• Consórcios Domus"]:::tableCore
+        FIN_CONTAS["<b>FIN_CONTAS_BANCARIAS</b><br/>• BB, Bradesco, Itaú, Sicredi, Sicoob<br/>• Saldo em Tempo Real"]:::tableCore
+        FIN_LANCAMENTOS["<b>FIN_LANCAMENTOS (Razão com Idempotência)</b><br/>• Natureza: Pagar / Receber / Avulso<br/>• Competência (DRE) vs Vencimento (Caixa)<br/>• Chave Única Anti-Duplicidade<br/>• Valor Efetivo = Nominal + Encargos - Desc"]:::tableAccent
+        FIN_OFX["<b>FIN_CONCILIACOES_EXTRATO</b><br/>• Importação OFX / Extrato Bancário<br/>• Hash FitID & Reconciliação Automática"]:::tableCore
+        FIN_DRE["<b>FIN_FECHAMENTOS_PERIODO (DRE Mensal)</b><br/>• Receita Bruta Intermediação<br/>• (-) Retenções & Impostos<br/>• (-) Comissões & Repasses Líquidos<br/>• (=) Resultado Líquido Operacional"]:::tableMaster
+    end
+
+    subgraph IMOBILIARIO ["🏢 BACKOFFICE IMOBILIÁRIO, CONTRATOS & REPASSES"]
+        direction TB
+        IMOB_ACERVO["<b>IMOB_IMOVEIS_PATRIMONIO</b><br/>• Código Ref (GAMA-RES, GAMA-FAZ)<br/>• Matrícula & Cadastro Prefeitura<br/>• Status: Disponível, Locado, Vendido"]:::tableCore
+        IMOB_CONTRATOS["<b>IMOB_CONTRATOS</b><br/>• Locação, Promessa Compra/Venda, Agro<br/>• Taxa Adm: 8% a 10%<br/>• Vencimento Dia Aluguel<br/>• Garantia: Caução, Fiança, Fiador"]:::tableAccent
+        IMOB_REPASSES["<b>IMOB_REPASSES_LOCACAO</b><br/>• Aluguel Bruto Recebido<br/>• (-) Taxa Adm Retida (Receita Gama)<br/>• (-) Retenção IRRF Carnê Leão<br/>• (=) Repasse Líquido Proprietário"]:::tableCore
+        IMOB_COMISSOES["<b>IMOB_COMISSOES_CORRETAGEM</b><br/>• Base Venda / Locação (Honorários 6%)<br/>• Split Corretor (40% a 50%)<br/>• Agendamento & Liquidação"]:::tableCore
+        IMOB_VISTORIAS["<b>IMOB_VISTORIAS_DIGITAIS</b><br/>• Checklist Cômodo a Cômodo<br/>• Fotos com Hash SHA-256<br/>• Assinatura Eletrônica Touch"]:::tableCore
+    end
+
+    subgraph CONSORCIOS ["💼 BACKOFFICE DE CONSÓRCIOS & CRÉDITO (DOMUS)"]
+        direction TB
+        CONS_ADMIN["<b>CONSORCIO_ADMINISTRADORAS</b><br/>• Porto Seguro, Rodobens, Itaú, Embracon<br/>• Registro Bacen & Tabela Comissão"]:::tableCore
+        CONS_COTAS["<b>CONSORCIO_COTAS</b><br/>• Segmentos: Imobiliário & Agro MT<br/>• Crédito Nominal & Parcela Mensal<br/>• Status: Ativa, Contemplada, Cancelada"]:::tableAccent
+        CONS_FATURAMENTO["<b>CONSORCIO_COMISSOES_FATURAMENTO</b><br/>• Faturamento Físico/Jurídico<br/>• Recebimento Gama vs Repasse Consultor<br/>• Integração Direta com Razão Financeiro"]:::tableCore
+    end
+
+    subgraph FISCAL ["📜 MÓDULO FISCAL, TRIBUTÁRIO NACIONAL & DIMOB"]
+        direction TB
+        FIS_CERT["<b>FIS_CERTIFICADOS_A1</b><br/>• PFX Criptografado AES-256-GCM<br/>• Monitoramento Validade A1"]:::tableCore
+        FIS_EMITENTE["<b>FIS_EMITENTES_SERVICO</b><br/>• CNAE 6821-8/01 (Intermediação)<br/>• Inscrição Municipal Tangará da Serra<br/>• Alíquota ISS 5.00%"]:::tableCore
+        FIS_NFSE["<b>FIS_NFSE_EMITIDAS</b><br/>• Emissão NFS-e sobre Honorários<br/>• Retenções Federais (PIS/COFINS/CSLL)<br/>• Padrão Nacional / SEFIN"]:::tableMaster
+        FIS_DIMOB["<b>FIS_DIMOB_DECLARACOES (Receita Federal)</b><br/>• Declaração Anual de Atividades Imobiliárias<br/>• Cruzamento CPF/CNPJ Locador x Inquilino<br/>• Valor Anual Intermediado & IRRF Retido"]:::tableMaster
+        FIS_REFORMA["<b>REFORMA TRIBUTÁRIA (IBS / CBS)</b><br/>• Classificação CST IBS/CBS por Serviço<br/>• Regime Específico Locação & Intermediação"]:::tableCore
+    end
+
+    subgraph COMPLIANCE ["🛡️ AUDITORIA IMUTÁVEL & COMPLIANCE COAF"]
+        direction TB
+        AUDITORIA["<b>AUDITORIA_TRILHA_IMUTAVEL</b><br/>• Log Imutável de INSERT / UPDATE / DELETE<br/>• Assinatura Criptográfica SHA-256<br/>• Usuário, IP, Antes x Depois"]:::tableMaster
+        COAF["<b>COMPLIANCE_COAF_DILIGENCIA</b><br/>• Prevenção à Lavagem de Dinheiro (Res. COAF 40)<br/>• Monitoramento de Operações em Espécie<br/>• Dossiê de Diligência Cadastral PEP"]:::tableMaster
+    end
+
+    %% Relacionamentos e Fluxos Integrados
+    GAMA_MATRIZ --> UNIDADES
+    GAMA_MATRIZ --> USUARIOS
+    USUARIOS --> PERFIS_RBAC
+    GAMA_MATRIZ --> CONTRAPARTES
+
+    CONTRAPARTES --> IMOB_ACERVO
+    IMOB_ACERVO --> IMOB_CONTRATOS
+    USUARIOS --> IMOB_CONTRATOS
+    CONTRAPARTES --> IMOB_CONTRATOS
+
+    IMOB_CONTRATOS --> IMOB_REPASSES
+    IMOB_CONTRATOS --> IMOB_COMISSOES
+    IMOB_CONTRATOS --> IMOB_VISTORIAS
+
+    CONS_ADMIN --> CONS_COTAS
+    CONTRAPARTES --> CONS_COTAS
+    USUARIOS --> CONS_COTAS
+    CONS_COTAS --> CONS_FATURAMENTO
+
+    %% Integração Financeira Automática (Razão Universal)
+    IMOB_REPASSES -.->|Gera Contas a Pagar| FIN_LANCAMENTOS
+    IMOB_CONTRATOS -.->|Gera Contas a Receber| FIN_LANCAMENTOS
+    IMOB_COMISSOES -.->|Gera Pagamento Split| FIN_LANCAMENTOS
+    CONS_FATURAMENTO -.->|Receita Comissão Faturada| FIN_LANCAMENTOS
+
+    FIN_PLANO --> FIN_LANCAMENTOS
+    FIN_CENTROS --> FIN_LANCAMENTOS
+    FIN_CONTAS --> FIN_LANCAMENTOS
+    FIN_CONTAS --> FIN_OFX
+    FIN_LANCAMENTOS --> FIN_DRE
+
+    %% Integração Fiscal e DIMOB
+    IMOB_CONTRATOS -.->|Faturamento de Serviços| FIS_NFSE
+    IMOB_REPASSES -.->|Dados Anuais para Receita Federal| FIS_DIMOB
+    FIS_CERT --> FIS_NFSE
+    FIS_EMITENTE --> FIS_NFSE
+    FIS_REFORMA --> FIS_NFSE
+
+    %% Auditoria e Compliance COAF
+    IMOB_CONTRATOS -.->|Análise de Risco & Espécie| COAF
+    FIN_LANCAMENTOS -.->|Trilha de Auditoria Criptografada| AUDITORIA
+    IMOB_REPASSES -.->|Trilha de Auditoria Criptografada| AUDITORIA

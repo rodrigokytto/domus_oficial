@@ -1,0 +1,101 @@
+erDiagram
+    EMPRESAS ||--o{ UNIDADES_NEGOCIO : "possui unidades"
+    EMPRESAS ||--o{ USUARIOS : "emprega equipe"
+    USUARIOS ||--o{ PERFIS_PERMISSOES : "define controle RBAC"
+    EMPRESAS ||--o{ CONTRAPARTES : "cadastra clientes e fornecedores"
+
+    EMPRESAS ||--o{ FIN_CENTROS_CUSTO : "aloca centros"
+    EMPRESAS ||--o{ FIN_PLANO_CONTAS : "estrutura contas"
+    EMPRESAS ||--o{ FIN_CONTAS_BANCARIAS : "opera tesouraria"
+    EMPRESAS ||--o{ FIN_LANCAMENTOS : "registra razao universal"
+    FIN_LANCAMENTOS }o--|| FIN_PLANO_CONTAS : "classifica DRE"
+    FIN_LANCAMENTOS }o--|| FIN_CENTROS_CUSTO : "rateia centro"
+    FIN_LANCAMENTOS }o--o| FIN_CONTAS_BANCARIAS : "movimenta conta"
+    FIN_LANCAMENTOS }o--o| CONTRAPARTES : "favorece contraparte"
+    FIN_CONTAS_BANCARIAS ||--o{ FIN_CONCILIACOES_EXTRATO : "concilia OFX"
+    EMPRESAS ||--o{ FIN_FECHAMENTOS_PERIODO : "consolida DRE mensal"
+
+    EMPRESAS ||--o{ IMOB_IMOVEIS_PATRIMONIO : "administra carteira"
+    CONTRAPARTES ||--o{ IMOB_IMOVEIS_PATRIMONIO : "proprietario titular"
+    EMPRESAS ||--o{ IMOB_CONTRATOS : "firma contratos"
+    IMOB_CONTRATOS }o--|| IMOB_IMOVEIS_PATRIMONIO : "vincula imovel"
+    IMOB_CONTRATOS }o--|| CONTRAPARTES : "locador ou vendedor"
+    IMOB_CONTRATOS }o--|| CONTRAPARTES : "locatario ou comprador"
+    IMOB_CONTRATOS }o--|| USUARIOS : "corretor responsavel"
+    IMOB_CONTRATOS ||--o{ IMOB_REPASSES_LOCACAO : "gera repasses"
+    IMOB_CONTRATOS ||--o{ IMOB_COMISSOES_CORRETAGEM : "comissiona equipe"
+    IMOB_CONTRATOS ||--o{ IMOB_VISTORIAS_DIGITAIS : "laudo vistoria"
+    IMOB_REPASSES_LOCACAO }o--o| FIN_LANCAMENTOS : "baixa no financeiro"
+    IMOB_COMISSOES_CORRETAGEM }o--o| FIN_LANCAMENTOS : "pagamento comissao"
+
+    CONSORCIO_ADMINISTRADORAS ||--o{ CONSORCIO_COTAS : "emite cotas BACEN"
+    EMPRESAS ||--o{ CONSORCIO_COTAS : "assessoria Domus"
+    CONSORCIO_COTAS }o--|| CONTRAPARTES : "consorciado"
+    CONSORCIO_COTAS ||--o{ CONSORCIO_COMISSOES_FATURAMENTO : "comissao fatura"
+    CONSORCIO_COMISSOES_FATURAMENTO }o--o| FIN_LANCAMENTOS : "receita faturada"
+
+    EMPRESAS ||--o{ FIS_CERTIFICADOS_A1 : "autentica A1"
+    EMPRESAS ||--o{ FIS_EMITENTES_SERVICO : "configura NFS-e"
+    EMPRESAS ||--o{ FIS_NFSE_EMITIDAS : "emite NFS-e Tangara"
+    IMOB_CONTRATOS ||--o{ FIS_NFSE_EMITIDAS : "tributa honorarios"
+    EMPRESAS ||--o{ FIS_DIMOB_DECLARACOES : "transmite DIMOB"
+    FIS_DIMOB_DECLARACOES ||--o{ FIS_DIMOB_REGISTROS_LOCACAO : "detalha operacoes"
+    IMOB_CONTRATOS ||--o{ FIS_DIMOB_REGISTROS_LOCACAO : "alimenta Receita"
+    EMPRESAS ||--o{ FIS_CLASSIFICACAO_IBS_CBS : "enquadra IBS e CBS"
+
+    EMPRESAS ||--o{ AUDITORIA_TRILHA_IMUTAVEL : "auditoria SHA-256"
+    IMOB_CONTRATOS ||--o{ COMPLIANCE_COAF_DILIGENCIA : "diligencia COAF"
+
+    EMPRESAS {
+        uuid id PK
+        string cnpj "52.894.120/0001-44"
+        string razao_social "Gama Patrimonial Ltda"
+        string creci_juridico "J-14280 MT"
+        string cidade "Tangara da Serra - MT"
+    }
+
+    FIN_LANCAMENTOS {
+        uuid id PK
+        string tipo "receita | despesa"
+        string natureza "pagar | receber | avulso"
+        decimal valor_efetivo
+        date data_competencia
+        date data_vencimento
+        string status "pendente | liquidado"
+        string chave_idempotencia
+    }
+
+    IMOB_CONTRATOS {
+        uuid id PK
+        string numero_contrato
+        string tipo_contrato "locacao | venda | agro"
+        decimal valor_contrato
+        decimal taxa_administracao_perc "10%"
+        string status "ativo | encerrado"
+    }
+
+    IMOB_REPASSES_LOCACAO {
+        uuid id PK
+        string mes_competencia
+        decimal valor_aluguel_bruto
+        decimal taxa_administracao_retida
+        decimal valor_liquido_repasse
+        date data_prevista_repasse
+        string status
+    }
+
+    FIS_NFSE_EMITIDAS {
+        uuid id PK
+        bigint numero_nfse
+        decimal valor_servicos
+        decimal valor_iss
+        string status "autorizada"
+    }
+
+    FIS_DIMOB_DECLARACOES {
+        uuid id PK
+        int ano_calendario "2026"
+        decimal total_valor_intermediado
+        decimal total_comissao_recebida
+        string status "transmitida"
+    }

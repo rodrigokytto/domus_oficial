@@ -11,6 +11,10 @@ import {
   ChevronRight,
   ShieldCheck,
   ExternalLink,
+  DollarSign,
+  Coins,
+  FileCode2,
+  ShieldAlert,
 } from "lucide-react";
 import { MARCA_GAMA } from "../lib/marcaGama";
 
@@ -20,7 +24,11 @@ export type SecaoPlataforma =
   | "crm"
   | "vistorias"
   | "contratos"
+  | "financeiro"
+  | "repasses"
+  | "fiscal"
   | "consorcios"
+  | "compliance"
   | "agenda";
 
 interface Props {
@@ -42,7 +50,11 @@ export const LayoutPlataformaGama: React.FC<Props> = ({
     { id: "crm", label: "CRM & Funil de Vendas", icon: Users, badge: "8 leads" },
     { id: "vistorias", label: "Vistorias & Laudos Digitais", icon: ClipboardCheck },
     { id: "contratos", label: "Central de Minutas & Contratos", icon: FileText },
+    { id: "financeiro", label: "ERP Financeiro & DRE", icon: DollarSign, badge: "Kytto" },
+    { id: "repasses", label: "Repasses & Comissões", icon: Coins },
+    { id: "fiscal", label: "NFS-e & DIMOB (Receita)", icon: FileCode2 },
     { id: "consorcios", label: "Mesa de Consórcios Domus", icon: Landmark },
+    { id: "compliance", label: "Auditoria & COAF", icon: ShieldAlert },
     { id: "agenda", label: "Agenda & Compromissos", icon: Calendar },
   ];
 
@@ -100,7 +112,7 @@ export const LayoutPlataformaGama: React.FC<Props> = ({
               fontWeight: "700",
             }}
           >
-            Módulos de Gestão
+            Gestão & Backoffice
           </div>
 
           {itensMenu.map((item) => {
@@ -109,7 +121,6 @@ export const LayoutPlataformaGama: React.FC<Props> = ({
             return (
               <button
                 key={item.id}
-                type="button"
                 onClick={() => aoMudarSecao(item.id)}
                 style={{
                   display: "flex",
@@ -117,14 +128,15 @@ export const LayoutPlataformaGama: React.FC<Props> = ({
                   justifyContent: "space-between",
                   padding: "10px 14px",
                   borderRadius: "8px",
-                  border: ativo ? "1px solid #C6A15B" : "1px solid transparent",
-                  background: ativo ? "rgba(198, 161, 91, 0.15)" : "transparent",
+                  border: "none",
+                  background: ativo ? "rgba(198, 161, 91, 0.2)" : "transparent",
                   color: ativo ? "#C6A15B" : "#cbd5e1",
-                  fontSize: "13px",
                   fontWeight: ativo ? "700" : "500",
+                  fontSize: "13px",
                   cursor: "pointer",
                   textAlign: "left",
-                  transition: "all 0.2s",
+                  transition: "all 0.15s ease",
+                  borderLeft: ativo ? "3px solid #C6A15B" : "3px solid transparent",
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -134,7 +146,7 @@ export const LayoutPlataformaGama: React.FC<Props> = ({
                 {item.badge && (
                   <span
                     style={{
-                      background: ativo ? "#C6A15B" : "rgba(255,255,255,0.1)",
+                      background: ativo ? "#C6A15B" : "rgba(255, 255, 255, 0.1)",
                       color: ativo ? "#121212" : "#cbd5e1",
                       fontSize: "10px",
                       fontWeight: "700",
@@ -151,59 +163,75 @@ export const LayoutPlataformaGama: React.FC<Props> = ({
         </nav>
 
         {/* Rodapé da Sidebar */}
-        <div style={{ padding: "16px 20px", borderTop: "1px solid rgba(255, 255, 255, 0.1)" }}>
+        <div
+          style={{
+            padding: "16px 20px",
+            borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "10px",
+          }}
+        >
           <button
-            type="button"
             onClick={aoVoltarSite}
             style={{
-              width: "100%",
-              background: "#1e293b",
-              color: "#ffffff",
-              border: "1px solid #334155",
-              padding: "10px",
-              borderRadius: "8px",
-              fontSize: "12px",
-              fontWeight: "700",
-              cursor: "pointer",
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
               gap: "8px",
+              padding: "10px 12px",
+              borderRadius: "8px",
+              background: "rgba(255, 255, 255, 0.05)",
+              color: "#ffffff",
+              border: "1px solid rgba(255, 255, 255, 0.1)",
+              fontSize: "12px",
+              fontWeight: "600",
+              cursor: "pointer",
+              width: "100%",
             }}
           >
-            <LogOut size={14} />
-            Voltar ao Portal Público
+            <ExternalLink size={14} color="#C6A15B" />
+            <span>Voltar ao Portal Público</span>
           </button>
+
+          <div style={{ fontSize: "11px", color: "#64748b", textAlign: "center" }}>
+            {MARCA_GAMA.cidade} · Tangará da Serra - MT
+          </div>
         </div>
       </aside>
 
-      {/* Área Central de Conteúdo */}
+      {/* Conteúdo Principal */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
-        {/* Barra Superior Executiva */}
+        {/* Top bar da Plataforma */}
         <header
           style={{
+            height: "64px",
             background: "#ffffff",
             borderBottom: "1px solid #e2e8f0",
-            padding: "12px 28px",
             display: "flex",
-            justifyContent: "space-between",
             alignItems: "center",
+            justifyContent: "space-between",
+            padding: "0 28px",
+            position: "sticky",
+            top: 0,
+            zIndex: 10,
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <span style={{ fontSize: "14px", fontWeight: "700", color: "#121212" }}>
-              Plataforma Gama Patrimonial
-            </span>
+            <span style={{ fontSize: "14px", fontWeight: "700", color: "#121212" }}>Gama Patrimonial</span>
             <ChevronRight size={14} color="#94a3b8" />
             <span style={{ fontSize: "13px", color: "#64748b", textTransform: "capitalize" }}>
-              {itensMenu.find((i) => i.id === secaoAtiva)?.label}
+              {secaoAtiva}
             </span>
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
             <div style={{ textAlign: "right" }}>
-              <div style={{ fontSize: "13px", fontWeight: "700", color: "#121212" }}>Carlos Eduardo Gama</div>
-              <div style={{ fontSize: "11px", color: "#64748b" }}>Diretor Executivo · CRECI J-14280 MT</div>
+              <div style={{ fontSize: "13px", fontWeight: "700", color: "#121212" }}>
+                Diretoria Executiva
+              </div>
+              <div style={{ fontSize: "11px", color: "#C6A15B", fontWeight: "600" }}>
+                CRECI J-14280 MT
+              </div>
             </div>
             <div
               style={{
@@ -216,17 +244,17 @@ export const LayoutPlataformaGama: React.FC<Props> = ({
                 alignItems: "center",
                 justifyContent: "center",
                 fontWeight: "800",
-                fontSize: "13px",
-                border: "2px solid #C6A15B",
+                fontSize: "14px",
+                border: "1px solid #C6A15B",
               }}
             >
-              CG
+              GP
             </div>
           </div>
         </header>
 
-        {/* Conteúdo Dinâmico */}
-        <main style={{ padding: "28px", flex: 1, overflowY: "auto" }}>{children}</main>
+        {/* Corpo da Página */}
+        <main style={{ padding: "28px", flex: 1 }}>{children}</main>
       </div>
     </div>
   );

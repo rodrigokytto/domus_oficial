@@ -47,6 +47,10 @@ import { CrmFunilGama } from "./plataforma/CrmFunilGama";
 import { VistoriaDigitalGama } from "./plataforma/VistoriaDigitalGama";
 import { CentralMinutasGama } from "./plataforma/CentralMinutasGama";
 import { PainelConsorciosSite } from "./plataforma/PainelConsorciosSite";
+import { FinanceiroGama } from "./plataforma/FinanceiroGama";
+import { RepassesComissoesGama } from "./plataforma/RepassesComissoesGama";
+import { FiscalDimobGama } from "./plataforma/FiscalDimobGama";
+import { ComplianceCoafGama } from "./plataforma/ComplianceCoafGama";
 
 export const App: React.FC = () => {
   // Controle de Rotas
@@ -68,6 +72,10 @@ export const App: React.FC = () => {
       if (p.includes("/crm")) return "crm";
       if (p.includes("/vistorias")) return "vistorias";
       if (p.includes("/contratos")) return "contratos";
+      if (p.includes("/financeiro")) return "financeiro";
+      if (p.includes("/repasses")) return "repasses";
+      if (p.includes("/fiscal")) return "fiscal";
+      if (p.includes("/compliance")) return "compliance";
       if (p.includes("/consorcios")) return "consorcios";
       if (p.includes("/agenda")) return "agenda";
     }
@@ -92,6 +100,10 @@ export const App: React.FC = () => {
         setRotaAtual("plataforma");
         if (path.includes("/vistorias")) setSecaoPlataforma("vistorias");
         else if (path.includes("/contratos")) setSecaoPlataforma("contratos");
+        else if (path.includes("/financeiro")) setSecaoPlataforma("financeiro");
+        else if (path.includes("/repasses")) setSecaoPlataforma("repasses");
+        else if (path.includes("/fiscal")) setSecaoPlataforma("fiscal");
+        else if (path.includes("/compliance")) setSecaoPlataforma("compliance");
         else if (path.includes("/imoveis")) setSecaoPlataforma("imoveis");
         else if (path.includes("/crm")) setSecaoPlataforma("crm");
         else if (path.includes("/consorcios")) setSecaoPlataforma("consorcios");
@@ -184,7 +196,15 @@ export const App: React.FC = () => {
 
           {secaoPlataforma === "contratos" && <CentralMinutasGama />}
 
+          {secaoPlataforma === "financeiro" && <FinanceiroGama />}
+
+          {secaoPlataforma === "repasses" && <RepassesComissoesGama />}
+
+          {secaoPlataforma === "fiscal" && <FiscalDimobGama />}
+
           {secaoPlataforma === "consorcios" && <PainelConsorciosSite />}
+
+          {secaoPlataforma === "compliance" && <ComplianceCoafGama />}
 
           {secaoPlataforma === "agenda" && (
             <div style={{ background: "#ffffff", borderRadius: "12px", padding: "28px", border: "1px solid #e2e8f0" }}>
