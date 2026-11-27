@@ -29,7 +29,7 @@ export const VistoriaDigitalGama: React.FC = () => {
   const [imovelSelecionado, setImovelSelecionado] = useState("GM101 - Mansão Vale do Sol");
   const [locador, setLocador] = useState("Gama Patrimonial Gestão e Participações Ltda");
   const [locatario, setLocatario] = useState("Dr. Marcos Vinicius de Oliveira");
-  const [vistoriador, setVistoriador] = useState("Carlos Eduardo Gama - Perito CRECI J-14280 MT");
+  const [vistoriador, setVistoriador] = useState("Dr. Rodrigo Ribeiro Gonçalves (rodrigo.goncalves@kytto.com.br) - CRECI J-14280 MT");
 
   const [comodos, setComodos] = useState<ItemComodo[]>([
     { id: "1", nome: "Fachada & Entrada Principal", estado: "Novo", observacoes: "Pintura externa e iluminação em perfeito estado", fotosQtd: 3 },

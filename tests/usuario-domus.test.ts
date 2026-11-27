@@ -8,6 +8,7 @@ import {
   badgeCorPerfil,
   secoesPermitidasPorPerfil,
   USUARIO_OFICIAL_GGAMAS,
+  USUARIO_OFICIAL_RODRIGO,
 } from "../src/lib/authDomus";
 
 describe("Gestão de Usuário Multiperfil Domus - ggamas@gmail.com", () => {
@@ -30,6 +31,20 @@ describe("Gestão de Usuário Multiperfil Domus - ggamas@gmail.com", () => {
     expect(res.usuario?.perfis).toContain("gerente");
     expect(res.usuario?.perfis).toHaveLength(4);
     expect(res.token).toBeDefined();
+  });
+
+  it("deve autenticar com sucesso o usuario executivo oficial rodrigo.goncalves@kytto.com.br", () => {
+    const res = autenticarUsuario({
+      email: "rodrigo.goncalves@kytto.com.br",
+      senha: "#231215Verdao",
+    });
+
+    expect(res.sucesso).toBe(true);
+    expect(res.usuario).toBeDefined();
+    expect(res.usuario?.email).toBe("rodrigo.goncalves@kytto.com.br");
+    expect(res.usuario?.nome).toContain("Rodrigo Ribeiro Gonçalves");
+    expect(res.usuario?.perfis).toContain("gerente");
+    expect(res.usuario?.creci).toBe("CRECI J-14280 MT");
   });
 
   it("deve rejeitar autenticação com senha incorreta", () => {

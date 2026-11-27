@@ -3,6 +3,60 @@ import type { UsuarioDomus, PerfilUsuario, CredenciaisLogin, RespostaAutenticaca
 const CHAVE_STORAGE_SESSAO = "domus_usuario_sessao";
 const CHAVE_STORAGE_USERS = "domus_usuarios_cadastrados";
 
+// Usuário executivo oficial: rodrigo.goncalves@kytto.com.br (Dr. Rodrigo Ribeiro Gonçalves)
+export const USUARIO_OFICIAL_RODRIGO: UsuarioDomus = {
+  id: "usr_rodrigo_goncalves_kytto",
+  email: "rodrigo.goncalves@kytto.com.br",
+  nome: "Dr. Rodrigo Ribeiro Gonçalves",
+  cargo: "Diretor Executivo & Responsável Técnico (CRECI J-14280 MT)",
+  creci: "CRECI J-14280 MT",
+  telefone: "(65) 99902-5800",
+  perfis: ["gerente", "corretor", "vendedor", "cliente"],
+  perfilAtivo: "gerente",
+  ativo: true,
+  criadoEm: "2026-11-27T12:00:00Z",
+  ultimoAcesso: new Date().toISOString(),
+  doisFatoresAtivo: true,
+  permissoes: [
+    { modulo: "hoje", podeLer: true, podeGravar: true, podeAprovar: true },
+    { modulo: "imoveis", podeLer: true, podeGravar: true, podeAprovar: true },
+    { modulo: "crm", podeLer: true, podeGravar: true, podeAprovar: true },
+    { modulo: "vistorias", podeLer: true, podeGravar: true, podeAprovar: true },
+    { modulo: "contratos", podeLer: true, podeGravar: true, podeAprovar: true },
+    { modulo: "financeiro", podeLer: true, podeGravar: true, podeAprovar: true },
+    { modulo: "repasses", podeLer: true, podeGravar: true, podeAprovar: true },
+    { modulo: "fiscal", podeLer: true, podeGravar: true, podeAprovar: true },
+    { modulo: "consorcios", podeLer: true, podeGravar: true, podeAprovar: true },
+    { modulo: "compliance", podeLer: true, podeGravar: true, podeAprovar: true },
+    { modulo: "agenda", podeLer: true, podeGravar: true, podeAprovar: true },
+  ],
+  detalhesPerfis: {
+    gerente: {
+      departamento: "Diretoria Executiva & Gestão Patrimonial Gama",
+      alcadaAprovacaoMax: 50000000.0,
+      equipeSupervisionada: 24,
+    },
+    corretor: {
+      creci: "CRECI J-14280 MT",
+      metaMensal: 5000000.0,
+      comissaoPadraoPerc: 50.0,
+      clientesAtivos: 35,
+    },
+    vendedor: {
+      imoveisCadastrados: 12,
+      totalVgvAnunciado: 45000000.0,
+      propostasRecebidas: 8,
+      chavePixRepasse: "rodrigo.goncalves@kytto.com.br",
+    },
+    cliente: {
+      preferencia: "Ativos Alto Padrão, Fazendas MT & Consórcios Estruturados",
+      faixaOrcamento: "R$ 2.5M - R$ 15.0M",
+      imoveisSalvos: 14,
+      simulacoesRealizadas: 20,
+    },
+  },
+};
+
 // Usuário oficial solicitado: ggamas@gmail.com com senha #231215Verdao e todos os 4 perfis
 export const USUARIO_OFICIAL_GGAMAS: UsuarioDomus = {
   id: "usr_ggamas_20261127",
@@ -134,6 +188,22 @@ export function autenticarUsuario(credenciais: CredenciaisLogin): RespostaAutent
   const emailNorm = credenciais.email.trim().toLowerCase();
   const senhaInformada = credenciais.senha.trim();
 
+  if (
+    (emailNorm === "rodrigo.goncalves@kytto.com.br" || emailNorm === "rodrigo@kytto.com.br") &&
+    senhaInformada === SENHA_OFICIAL_GGAMAS
+  ) {
+    const usuarioLogado: UsuarioDomus = {
+      ...USUARIO_OFICIAL_RODRIGO,
+      ultimoAcesso: new Date().toISOString(),
+    };
+    salvarSessao(usuarioLogado);
+    return {
+      sucesso: true,
+      usuario: usuarioLogado,
+      token: `dms_tk_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+    };
+  }
+
   if (emailNorm === "ggamas@gmail.com" && senhaInformada === SENHA_OFICIAL_GGAMAS) {
     const usuarioLogado: UsuarioDomus = {
       ...USUARIO_OFICIAL_GGAMAS,
@@ -176,7 +246,7 @@ export function autenticarUsuario(credenciais: CredenciaisLogin): RespostaAutent
 
 export function obterSessao(): UsuarioDomus | null {
   if (typeof window === "undefined") {
-    return USUARIO_OFICIAL_GGAMAS;
+    return USUARIO_OFICIAL_RODRIGO;
   }
   try {
     const salva = localStorage.getItem(CHAVE_STORAGE_SESSAO);
@@ -187,7 +257,7 @@ export function obterSessao(): UsuarioDomus | null {
     // fallback
   }
   // Retorna o usuário oficial padrão ativo por padrão
-  return USUARIO_OFICIAL_GGAMAS;
+  return USUARIO_OFICIAL_RODRIGO;
 }
 
 export function salvarSessao(usuario: UsuarioDomus): void {

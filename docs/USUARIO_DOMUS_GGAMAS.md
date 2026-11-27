@@ -88,8 +88,8 @@ Os arquivos implementados e configurados no repositório `rodrigokytto/domus_ofi
 ## 4. Como Testar & Utilizar
 
 1. **No Frontend (`/plataforma`)**:
-   - Acesse a plataforma em produção: [https://domus-consorcios.onrender.com/plataforma](https://domus-consorcios.onrender.com/plataforma)
-   - O usuário `ggamas@gmail.com` já inicia autenticado como **Gerente Geral** (com acesso a 11 módulos de retaguarda).
+   - Acesse a plataforma em produção (GCP Cloud Run): [https://gamapatrimonial.com.br/plataforma](https://gamapatrimonial.com.br/plataforma)
+   - O usuário executivo oficial `rodrigo.goncalves@kytto.com.br` (Dr. Rodrigo Ribeiro Gonçalves) e `ggamas@gmail.com` iniciam com acesso completo como **Gerente Geral** (11 módulos de retaguarda).
    - No cabeçalho superior ou pelos botões de atalho rápido no banner do painel, alterne entre **Corretor Credenciado**, **Vendedor / Proprietário** ou **Cliente / Investidor**.
    - Uma notificação Toast animada confirma a troca e o menu lateral é filtrado dinamicamente com fallback de segurança.
    - Clique em **Ver Ficha** para visualizar a ficha cadastral completa com dados copiáveis e permissões granulares.
@@ -105,10 +105,10 @@ Os arquivos implementados e configurados no repositório `rodrigokytto/domus_ofi
 
 ---
 
-## 5. Validação em Produção (Render)
+## 5. Validação em Produção Oficial (Google Cloud Platform · Cloud Run)
 
-- **URL Pública da Aplicação**: [https://domus-consorcios.onrender.com](https://domus-consorcios.onrender.com)
-- **Área Restrita / Plataforma**: [https://domus-consorcios.onrender.com/plataforma](https://domus-consorcios.onrender.com/plataforma)
-- **Status do Serviço**: Ativo (HTTP 200 OK via CDN Cloudflare)
-- **Deploy ID**: `dep-dc4r2k2jnfac73bc81k0` (Live em 27/11/2026)
-- **Bundle Ativo**: `assets/index-2994RWS_.js` com carregamento instantâneo
+- **URL Pública da Aplicação**: [https://gamapatrimonial.com.br](https://gamapatrimonial.com.br)
+- **Área Restrita / Vistorias**: [https://gamapatrimonial.com.br/plataforma/vistorias](https://gamapatrimonial.com.br/plataforma/vistorias)
+- **Área Restrita / Contratos**: [https://gamapatrimonial.com.br/plataforma/contratos-minutas](https://gamapatrimonial.com.br/plataforma/contratos-minutas)
+- **Status do Serviço**: Ativo no Google Cloud Run (HTTP 200 OK via Google Frontend)
+- **Infraestrutura**: Google Cloud Platform (NUNCA RENDER)
