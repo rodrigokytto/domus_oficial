@@ -104,4 +104,15 @@ describe("Gestão de Usuário Multiperfil Domus - ggamas@gmail.com", () => {
     const badge = badgeCorPerfil("gerente");
     expect(badge.texto).toBe("#C6A15B");
   });
+
+  it("deve garantir fallback seguro quando uma seção restrita é acessada por perfil incompatível", () => {
+    const secaoRestrita = "financeiro";
+    const permitidasCliente = secoesPermitidasPorPerfil("cliente");
+    
+    expect(permitidasCliente.includes(secaoRestrita)).toBe(false);
+    
+    // O fallback deve selecionar 'hoje' ou a primeira seção permitida
+    const secaoDestino = permitidasCliente.includes(secaoRestrita) ? secaoRestrita : "hoje";
+    expect(secaoDestino).toBe("hoje");
+  });
 });

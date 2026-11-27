@@ -9,6 +9,8 @@ import {
   Search,
 } from "lucide-react";
 import { MARCA_GAMA } from "../lib/marcaGama";
+import type { UsuarioDomus } from "../types/usuario";
+import { rotuloPerfil } from "../lib/authDomus";
 
 interface Props {
   rotaAtual: "site" | "plataforma";
@@ -16,6 +18,7 @@ interface Props {
   aoAbrirIa: () => void;
   aoAbrirComparador: () => void;
   totalComparador: number;
+  usuario?: UsuarioDomus;
 }
 
 export const NavbarGama: React.FC<Props> = ({
@@ -24,6 +27,7 @@ export const NavbarGama: React.FC<Props> = ({
   aoAbrirIa,
   aoAbrirComparador,
   totalComparador,
+  usuario,
 }) => {
   return (
     <>
@@ -49,6 +53,23 @@ export const NavbarGama: React.FC<Props> = ({
           </span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          {usuario && (
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                background: "rgba(198, 161, 91, 0.12)",
+                border: "1px solid rgba(198, 161, 91, 0.35)",
+                padding: "3px 10px",
+                borderRadius: "4px",
+                fontSize: "11px",
+                color: "#C6A15B",
+              }}
+            >
+              <span>Conectado: <strong>{usuario.nome}</strong> ({rotuloPerfil(usuario.perfilAtivo)})</span>
+            </div>
+          )}
           <button
             type="button"
             onClick={() => aoNavegar(rotaAtual === "plataforma" ? "site" : "plataforma")}

@@ -23,7 +23,13 @@ import { IMOVEIS_MOCK } from "./data/imoveisMock";
 import type { Imovel } from "./types/imovel";
 import { simularConsorcio, TABELAS_ADMINISTRADORAS } from "./lib/motor-consorcios";
 import type { PerfilUsuario, UsuarioDomus } from "./types/usuario";
-import { obterSessao, USUARIO_OFICIAL_GGAMAS, alternarPerfilAtivo } from "./lib/authDomus";
+import {
+  obterSessao,
+  USUARIO_OFICIAL_GGAMAS,
+  alternarPerfilAtivo,
+  secoesPermitidasPorPerfil,
+  rotuloPerfil,
+} from "./lib/authDomus";
 
 // Componentes do Site Público
 import { NavbarGama } from "./components/NavbarGama";
@@ -93,11 +99,24 @@ export const App: React.FC = () => {
 
   // Usuário Multiperfil Domus (ggamas@gmail.com com corretor, cliente, vendedor e gerente)
   const [usuario, setUsuario] = useState<UsuarioDomus>(() => obterSessao() ?? USUARIO_OFICIAL_GGAMAS);
+  const [toast, setToast] = useState<{ visivel: boolean; mensagem: string } | null>(null);
 
   const handleMudarPerfil = (novoPerfil: PerfilUsuario) => {
     try {
       const u = alternarPerfilAtivo(novoPerfil);
       setUsuario(u);
+
+      // Redireciona de forma segura se a seção atual não pertencer ao novo perfil
+      const permitidas = secoesPermitidasPorPerfil(novoPerfil);
+      if (!permitidas.includes(secaoPlataforma)) {
+        setSecaoPlataforma("hoje");
+        if (typeof window !== "undefined") {
+          window.history.pushState({}, "", "/plataforma");
+        }
+      }
+
+      setToast({ visivel: true, mensagem: `Modo de operação: ${rotuloPerfil(novoPerfil)}` });
+      setTimeout(() => setToast(null), 3000);
     } catch (e) {
       console.error(e);
     }
@@ -202,6 +221,8 @@ export const App: React.FC = () => {
               imoveis={IMOVEIS_MOCK}
               aoNavegarSecao={(s) => setSecaoPlataforma(s)}
               aoAbrirPaperPdf={(im) => setImovelPaperPdf(im)}
+              usuario={usuario}
+              aoMudarPerfil={handleMudarPerfil}
             />
           )}
 
@@ -262,6 +283,7 @@ export const App: React.FC = () => {
             aoAbrirIa={() => setModalIaAberto(true)}
             aoAbrirComparador={() => setModalComparadorAberto(true)}
             totalComparador={comparadorIds.length}
+            usuario={usuario}
           />
 
           <main>
@@ -613,6 +635,37 @@ export const App: React.FC = () => {
       {/* MODAL AVALIAÇÃO INSTANTÂNEA AVM */}
       {modalAvaliacaoAberto && (
         <AvaliacaoImovelModal aoFechar={() => setModalAvaliacaoAberto(false)} />
+      )}
+
+      {/* TOAST DE FEEDBACK DE TRANSIÇÃO DE PERFIL */}
+      {toast && toast.visivel && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: "24px",
+            right: "24px",
+            background: "#121212",
+            color: "#ffffff",
+            border: "1px solid #C6A15B",
+            borderRadius: "10px",
+            padding: "14px 20px",
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.35)",
+            zIndex: 9999,
+          }}
+        >
+          <div
+            style={{
+              width: "8px",
+              height: "8px",
+              borderRadius: "50%",
+              background: "#C6A15B",
+            }}
+          />
+          <div style={{ fontSize: "13px", fontWeight: "700" }}>{toast.mensagem}</div>
+        </div>
       )}
     </div>
   );
