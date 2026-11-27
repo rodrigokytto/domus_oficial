@@ -410,7 +410,14 @@ const ACERVO_INICIAL_GAMA: MinutaContrato[] = [
 
 export const CentralMinutasGama: React.FC = () => {
   const [segmentoAtivo, setSegmentoAtivo] = useState<SegmentoContrato>("imobiliaria");
-  const [abaAtiva, setAbaAtiva] = useState<"novo" | "visualizar" | "acervo">("novo");
+  const [abaAtiva, setAbaAtiva] = useState<"novo" | "visualizar" | "acervo">(() => {
+    if (typeof window !== "undefined") {
+      const p = new URLSearchParams(window.location.search);
+      const a = p.get("aba");
+      if (a === "visualizar" || a === "acervo") return a;
+    }
+    return "novo";
+  });
   const [acervo, setAcervo] = useState<MinutaContrato[]>(ACERVO_INICIAL_GAMA);
   const [minutaAtiva, setMinutaAtiva] = useState<MinutaContrato>(ACERVO_INICIAL_GAMA[1]);
 
